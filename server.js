@@ -1,7 +1,12 @@
-const express = require("express");
+const http = require('http');
+const app = require('./app');
+
 const cors = require("cors");
 
-const app = express();
+app.set("port", process.env.PORT || 3000);
+const server = http.createServer(app);
+
+server.listen(process.env.PORT || 3000);
 
 var corsOptions = {
   origin: "http://localhost:8081",
@@ -9,16 +14,16 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 
-// parse requests of content-type - application/json
-app.use(express.json());
+// // parse requests of content-type - application/json
+// app.use(express.json());
 
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+// // parse requests of content-type - application/x-www-form-urlencoded
+// app.use(express.urlencoded({ extended: true }));
 
-// simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
-});
+// // simple route
+// app.get("/", (req, res) => {
+//   res.json({ message: "Welcome to bezkoder application." });
+// });
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
