@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application. hiihihhih" });
+  res.json({ message: "Welcome to bezkoder application." });
 });
 
 // set port, listen for requests
