@@ -1,41 +1,45 @@
+//on a besoin d'express. On importe express dans une constante
 const express = require("express");
 
+//on importe bodyparser pour transformer le corp de la requête en JSON, en objet JS utilisable
+const bodyParser = require("body-parser");
+
+//on crée une constante app qui est notre application. 
+//On appel la méthode express ce qui permet de crée une application express
 const app = express();
 
-const mongoose = require("mongoose");
+//on importe le router
+// const stuffRoutes = require("./routes/stuff");
 
-mongoose
-  .connect(
-    "mongodb+srv://Lois:DEVweb2021@apisecuriseep6.ynmqf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
-  .then(() => console.log("Connexion à MongoDB réussie !"))
-    .catch(() => console.log("Connexion à MongoDB échouée !"));
-  
+//=================================>
+/////////////////// middleware CORS
+//=================================>
 app.use((req, res, next) => {
-  //enregistre « Requête reçue ! » dans la console
-    console.log("Requête bien reçu !");
-    //passe l'exécution
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  );
   next();
 });
+//=================================>
+/////////////////// middleware CORS
+//=================================>
 
-app.use((req, res, next) => {
-  //ajoute un code d'état 201 à la réponse
-  res.status(201);
-  //passe l'exécution
-  next();
-});
+//On importe toute la logique de notre routeur. 
+// app.use("/api/stuff", stuffRoutes)
 
-app.use((req, res, next) => {
-  //envoie la réponse JSON
-  res.json({ message: "Votre requête a bien été reçue !" });
-  //passe l'exécution
-  next();
-});
 
-app.use((req, res, next) => {
-  //enregistre « Réponse envoyée avec succès ! » dans la console
-  console.log("Réponse envoyée avec succès");
-});
-
+// on exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
+//Notamment depuis notre serveur node.
 module.exports = app;
+
+//avant les routes de l'application, on utilise app.use pour ttes les routes de l'application
+//on utilise une méthode .json qui va transformer notre requête en objet JSON.
+app.use(bodyParser.json());
+
+

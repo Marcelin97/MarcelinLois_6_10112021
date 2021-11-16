@@ -1,7 +1,7 @@
 const http = require('http');
-const app = require('./app');
 
-const cors = require("cors");
+//on importe notre application, pour importé le app.js qui est dans le même dossier.
+const app = require('./app');
 
 //la fonction normalizePort renvoie un port valide, 
 //qu'il soit fourni sous la forme d'un numéro ou d'une chaîne
@@ -43,6 +43,7 @@ const errorHandler = (error) => {
   }
 };
 
+//on passe à notre serveur notre application.
 const server = http.createServer(app);
 
 //un écouteur d'évènements est également enregistré, consignant le port ou 
@@ -57,25 +58,13 @@ server.on("listening", () => {
 server.listen(port);
 
 
-var corsOptions = {
-  origin: "http://localhost:8081",
-};
 
-app.use(cors(corsOptions));
+// const cors = require("cors");
 
-// // parse requests of content-type - application/json
-// app.use(express.json());
+// var corsOptions = {
+//   origin: "http://localhost:3000",
+// };
 
-// // parse requests of content-type - application/x-www-form-urlencoded
-// app.use(express.urlencoded({ extended: true }));
+// app.use(cors(corsOptions));
 
-// // simple route
-// app.get("/", (req, res) => {
-//   res.json({ message: "Welcome to bezkoder application." });
-// });
 
-// set port, listen for requests
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
