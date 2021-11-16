@@ -1,8 +1,15 @@
 //on a besoin d'express. On importe express dans une constante
 const express = require("express");
+
+//on importe bodyparser pour transformer le corp de la requête en JSON, en objet JS utilisable
+const bodyParser = require("body-parser");
+
 //on crée une constante app qui est notre application. 
 //On appel la méthode express ce qui permet de crée une application express
 const app = express();
+
+
+const User = require("./models/user");
 
 //=================================>
 /////////////////// middleware CORS
@@ -26,6 +33,17 @@ app.use((req, res, next) => {
 // on exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
 //Notamment depuis notre serveur node.
 module.exports = app;
+
+//avant les routes de l'application, on utilise app.use pour ttes les routes de l'application
+//on utilise une méthode .json qui va transformer notre requête en objet JSON.
+app.use(bodyParser.json());
+
+app.post((req, res, next) => {
+  console.log(req.body);
+  res.status(201).json({
+    message: 'objet crée !'
+  });
+});
 
 app.use((req, res, next) => {
   //enregistre « Requête reçue ! » dans la console
