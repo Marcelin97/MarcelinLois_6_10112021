@@ -8,8 +8,8 @@ const bodyParser = require("body-parser");
 //On appel la méthode express ce qui permet de crée une application express
 const app = express();
 
-
-const User = require("./models/user");
+//on importe le router
+// const stuffRoutes = require("./routes/stuff");
 
 //=================================>
 /////////////////// middleware CORS
@@ -30,6 +30,10 @@ app.use((req, res, next) => {
 /////////////////// middleware CORS
 //=================================>
 
+//On importe toute la logique de notre routeur. 
+// app.use("/api/stuff", stuffRoutes)
+
+
 // on exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
 //Notamment depuis notre serveur node.
 module.exports = app;
@@ -38,36 +42,4 @@ module.exports = app;
 //on utilise une méthode .json qui va transformer notre requête en objet JSON.
 app.use(bodyParser.json());
 
-app.post((req, res, next) => {
-  console.log(req.body);
-  res.status(201).json({
-    message: 'objet crée !'
-  });
-});
-
-app.use((req, res, next) => {
-  //enregistre « Requête reçue ! » dans la console
-    console.log("Requête bien reçu !");
-    //passe au prochain middlewares pour terminer cette première requête
-  next();
-});
-
-app.use((req, res, next) => {
-  //on modifie le code de la réponse HTTP, on le modifie en code 201 à la réponse
-  res.status(201);
-  //passe l'exécution
-  next();
-});
-
-app.use((req, res, next) => {
-  //envoie l'objet réponse et la méthode JSON pour renvoyé une réponse en format JSON
-  res.json({ message: "Votre requête a bien été reçue !" });
-  //passe l'exécution
-  next();
-});
-
-app.use((req, res, next) => {
-  //enregistre « Réponse envoyée avec succès ! » dans la console
-  console.log("Réponse envoyée avec succès");
-});
 
