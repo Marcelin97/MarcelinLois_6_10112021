@@ -5,6 +5,9 @@ const bcrypt = require("bcrypt");
 //on a besoin de notre model users
 const User = require("../models/user");
 
+//j'importe mon package pour la vérification et la création de token
+const jwt = require("jsonwebtoken");
+
 //le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
 
 //////////////////////////////////////////////////////////////////////////////
