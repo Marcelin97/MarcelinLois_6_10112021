@@ -41,4 +41,47 @@ exports.signup = (req, res, next) => {
 ////////la fonction pour l'enregistrement de nouveaux utilisateurs////////////
 //////////////////////////////////////////////////////////////////////////////
 
-exports.login = (req, res, next) => {};
+//////////////////////////////////////////////////////////////////////////////
+///////////la fonction pour connecter des utilisateurs existants//////////////
+//////////////////////////////////////////////////////////////////////////////
+
+exports.login = (req, res, next) => {
+  //on va commencer par trouvé le user dans la BDD qui correspond à l'email renseigner par la personne
+  User.findOne({ email: req.body.email })
+    .then((user) => {
+      //si on a pas trouvé de user
+      if (!user) {
+        //on renvoi un 401 avec notre propre message
+        return res.status(401).json({ error: "Utilisateur non trouvé !" });
+        }
+        //si on arrive ici c'est qu'on a trouvé un utilisateur
+      //on utilise bcrypt pour comparer le MDP envoyé par l'utilisateur qui essai de se connecter avec le user qu'on a reçu de la BDD
+      bcrypt
+        //on utilise la méthode .compare
+        .compare(req.body.password, user.password)
+        .then((valid) => {
+          //on créer un boolean
+          //si la comparaison n'est pas bonne - si le MDP n'est pas le meme
+          if (!valid) {
+            return res.status(401).json({ error: "Mot de passe incorrect !" });
+          }
+          //si le MDP est le bon l'utilisateur reçoit
+          //son user id et son token d'identification
+          res.status(200).json({
+            userId: user._id,
+            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+              expiresIn: "24h",
+            })
+          });
+        })
+        // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user, 
+        //on peut mettre une erreur serveur
+        .catch((error) => res.status(500).json({ error }));
+    })
+    //c'est uniquement si il a un problème de connexion ou lié à mongodb
+    //status 500 pour une erreur server
+    .catch((error) => res.status(500).json({ error }));
+};
+//////////////////////////////////////////////////////////////////////////////
+///////////la fonction pour connecter des utilisateurs existants//////////////
+//////////////////////////////////////////////////////////////////////////////
