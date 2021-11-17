@@ -8,8 +8,9 @@ const bodyParser = require("body-parser");
 //On appel la méthode express ce qui permet de crée une application express
 const app = express();
 
-//on importe le router
+//on importe nos router
 // const stuffRoutes = require("./routes/stuff");
+const userRoutes = require("./app/routes/user")
 
 //=================================>
 /////////////////// middleware CORS
@@ -32,7 +33,7 @@ app.use((req, res, next) => {
 
 //On importe toute la logique de notre routeur. 
 // app.use("/api/stuff", stuffRoutes)
-
+app.use("/api/auth", userRoutes );
 
 // on exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
 //Notamment depuis notre serveur node.

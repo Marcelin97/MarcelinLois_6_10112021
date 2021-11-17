@@ -6,6 +6,9 @@ const router = express.Router();
 const User = require("../models/user");
 // const Sauce = require("../models/sauce");
 
+// const stuffCrl = require("../constrollers/stuff")
+const auth = require("../middleware/auth")
+
 router.post('/', (req, res, next) => {
   //on supprime en amont le faux_id envoyé par le front-end
   delete req.body._id;
