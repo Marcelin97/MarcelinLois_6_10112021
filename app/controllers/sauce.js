@@ -1,6 +1,16 @@
 const Sauce = require("../models/sauce")
 
-
+exports.createSauce = (req, res, next) => {
+  delete req.body._id;
+  const sauce = new Sauce({
+    //l"opérateur spread ... permet de copier les champs qu'il y a dans la body de la requête
+    ...req.body,
+  });
+  sauce
+    .save()
+    .then(() => res.status(201).json({ message: "Sauce enregistré !" }))
+    .catch((error) => res.status(400).json({ error }));
+};
 
 exports.getOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })

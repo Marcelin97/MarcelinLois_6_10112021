@@ -1,12 +1,11 @@
 //on a besoin d'express. On importe express dans une constante
 const express = require("express");
 
-//on importe bodyparser pour transformer le corp de la requête en JSON, en objet JS utilisable
+//on importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
 const bodyParser = require("body-parser");
 
 //j'importe ma BDD qui est dans le fichier db.config.js
 const mongoose = require("./config/db.config")
-
 
 //on crée une constante app qui est notre application. 
 //On appel la méthode express ce qui permet de crée une application express
