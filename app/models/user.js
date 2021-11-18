@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-//on récupère son controleur d'authentification unique
+//on récupère son contrôleur d'authentification unique
 const uniqueValidator = require('mongoose-unique-validator');
 
 //on créer notre schéma pour l'authentification
 const userSchema = mongoose.Schema({
-    //on rajoute une configuration qui sera unique: true qui évite de s'enregistrer avec la meme email
+    //on rajoute une configuration qui sera unique: true qui évite de s'enregistrer avec le même e-mail
     email: { type: String, require: true, unique: true },
     password: { type: String, require: true }
 });

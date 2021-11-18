@@ -72,9 +72,12 @@ exports.login = (req, res, next) => {
           //son user id et son token d'identification
           res.status(200).json({
             userId: user._id,
+            //nous utilisons une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour encoder notre token 
+            //(à remplacer par une chaîne aléatoire beaucoup plus longue pour la production) ;
             token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+              //L'utilisateur devra donc se reconnecter au bout de 24 heures
               expiresIn: "24h",
-            })
+            }),
           });
         })
         // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user, 

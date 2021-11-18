@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     //on va utiliser le faite qu'on connaît la forme de se headers pour récupérer le token
     //on utilise les headers de la requête et le header autorisation que l'on va splite autour d'un espace
     // sa nous retourne un tableau avec bear en premier et le token en deuxième élément
-    //donc sa nous retournera uniqument le token
+    //donc sa nous retournera uniquement le token
     const token = req.headers.authorization.split(" ")[1];
     //la seconde étape et de décoder le token
     //on va utiliser le package jsonwebtoken et la fonction verify
@@ -20,9 +20,9 @@ module.exports = (req, res, next) => {
     //si jamais il y a un userId dans le corp de la requete on veut vérifier que cela correspond bien a celle du token
     //dans le if c'est si cela ne correspond pas
     if (req.body.userId && req.body.userId !== userId) {
-      //on peut utiliser thow pour renvoyé une erreur
+      //on peut utiliser throw pour renvoyé une erreur
       throw "User ID non valable !";
-      //sinon si tout va bien on peut passer la requete au prochain middleware
+      //sinon si tout va bien on peut passer la requête au prochain middleware
     } else {
       next();
     }
