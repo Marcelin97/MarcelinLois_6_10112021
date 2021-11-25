@@ -1,5 +1,6 @@
 const Sauce = require("../models/sauce")
 
+//POST
 exports.createSauce = (req, res, next) => {
   //supprime l'ID envoyé par le front
   delete req.body._id;
@@ -14,14 +15,32 @@ exports.createSauce = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+//PUT
+exports.modifySauce = (req, res, next) => {
+  Sauce.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id})
+    .then(() => {
+      res.status(200).json({
+        message: "Sauce mise à jour avec succès !!",
+      });
+    })
+    .catch((error) => {
+      res.status(400).json({
+        error: error,
+      });
+    });
+};
+
+//GET ONE
 exports.getOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => res.status(200).json(sauce))
         .catch(error => res.status(404).json({ error }));
 };
 
-exports.getAllSauce = (req, res, next) => {
+//GET ALL
+exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => res.status(200).json(sauces))
     .catch((error) => res.status(400).json({ error }));
 };
+
