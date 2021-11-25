@@ -12,6 +12,9 @@ router.post("/", sauceCtrl.createSauce);
 //PUT
 router.put("/:id", sauceCtrl.modifySauce);
 
+//DELETE
+router.delete("/:id", stuffCtrl.deleteSauce);
+
 //GET pour un seul objet
 router.get("/:id", auth, sauceCtrl.getOneSauce);
 
