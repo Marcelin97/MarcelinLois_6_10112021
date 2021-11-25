@@ -6,6 +6,7 @@ exports.createSauce = (req, res, next) => {
     //l"opérateur spread ... permet de copier les champs qu'il y a dans la body de la requête
     ...req.body,
   });
+  //on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
     .save()
     .then(() => res.status(201).json({ message: "Sauce enregistré !" }))

@@ -15,7 +15,7 @@ const jwt = require("jsonwebtoken");
 //////////////////////////////////////////////////////////////////////////////
 
 exports.signup = (req, res, next) => {
-  //la première choses on Hash le mot de pass pour le crypter
+  //la première choses on Hash le mot de pass (c'est une fonction asynchrone qui prends du temps) pour le crypter
   //on appel la fonction bcrypt.hash pour crypter un MDP(on lui passe le MDP du corp de la requête, le solt c'est combien de fois on execute l'algo de hashage)
   bcrypt
     .hash(req.body.password, 10)

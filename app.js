@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 //=================================>
 
 //On importe toute la logique de nos routes. 
-app.use("/api/sauce", sauceRoutes);
+app.use("/api/sauces", sauceRoutes);
 app.use("/api/auth", userRoutes );
 
 //On exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
