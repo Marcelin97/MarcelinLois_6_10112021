@@ -1,12 +1,11 @@
 //on a besoin d'express. On importe express dans une constante
 const express = require("express");
 
-//on importe bodyparser pour transformer le corp de la requête en JSON, en objet JS utilisable
+//on importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
 const bodyParser = require("body-parser");
 
 //j'importe ma BDD qui est dans le fichier db.config.js
-const mongoose = require("./config/db.config")
-
+const mongoose = require("./config/db.config");
 
 //on crée une constante app qui est notre application. 
 //On appel la méthode express ce qui permet de crée une application express
@@ -37,7 +36,7 @@ app.use((req, res, next) => {
 //=================================>
 
 //On importe toute la logique de nos routes. 
-app.use("/api/sauce", sauceRoutes);
+app.use("/api/sauces", sauceRoutes);
 app.use("/api/auth", userRoutes );
 
 //On exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
@@ -49,3 +48,12 @@ module.exports = app;
 //on utilise une méthode .json qui va transformer notre requête en objet JSON.
 app.use(bodyParser.json());
 
+// //paramètre les cookies en HTTP-only pour qu'ils ne puissents pas être modfié par un tiers
+// app.use(session({
+//   secret: "s3cur3"
+//   cookie: {
+//     secure: true,
+//     httponly: true,
+//     domain: 'http://localhost:3000'
+//   }
+// }));
