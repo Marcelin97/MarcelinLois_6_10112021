@@ -32,17 +32,29 @@ exports.modifySauce = (req, res, next) => {
 
 //DELETE
 exports.deleteSauce = (req, res, next) => {
-  Sauce.deleteOne({ _id: req.params.id })
-    .then(() => {
-      res.status(200).json({
-        message: "Sauce supprimée !",
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    if (!sauce) {
+      res.status(404).json({
+        error: new Error("Sauce non trouvé !"),
       });
-    })
-    .catch((error) => {
+    }
+    if (sauce.userId !== req.auth.userId) {
       res.status(400).json({
-        error: error,
+        error: new Error("Requête non autorisé !"),
       });
-    });
+    }
+    Sauce.deleteOne({ _id: req.params.id })
+      .then(() => {
+        res.status(200).json({
+          message: "Sauce supprimé !",
+        });
+      })
+      .catch((error) => {
+        res.status(400).json({
+          error: error,
+        });
+      });
+  });
 };
 
 //GET ONE

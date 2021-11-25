@@ -7,13 +7,13 @@ const sauceCtrl = require("../controllers/sauce")
 const auth = require("../middleware/auth");
 
 //POST
-router.post("/", sauceCtrl.createSauce);
+router.post("/", auth, sauceCtrl.createSauce);
 
 //PUT
-router.put("/:id", sauceCtrl.modifySauce);
+router.put("/:id", auth, sauceCtrl.modifySauce);
 
 //DELETE
-router.delete("/:id", stuffCtrl.deleteSauce);
+router.delete("/:id",auth, stuffCtrl.deleteSauce);
 
 //GET pour un seul objet
 router.get("/:id", auth, sauceCtrl.getOneSauce);
