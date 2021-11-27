@@ -26,8 +26,6 @@ app.use(cors(corsOptions));
 /////////////////// middleware CORS
 //=================================>
 
-
-
 //On exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
 //Notamment depuis notre serveur node.
 module.exports = app;
@@ -37,11 +35,14 @@ module.exports = app;
 //on utilise une méthode .json qui va transformer notre requête en objet JSON.
 app.use(bodyParser.json());
 
+//on récupère nos routes qui est l'index.js, appelé router.
 app.use("/api", router);
 
-app.listen(3000);
 
-// //paramètre les cookies en HTTP-only pour qu'ils ne puissents pas être modfié par un tiers
+app.listen(3000, () => {
+  console.log("server is listening on port 3000");
+});
+// //paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
 // app.use(session({
 //   secret: "s3cur3"
 //   cookie: {
