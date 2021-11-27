@@ -30,6 +30,33 @@ exports.modifySauce = (req, res, next) => {
     });
 };
 
+//DELETE
+exports.deleteSauce = (req, res, next) => {
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    if (!sauce) {
+      res.status(404).json({
+        error: new Error("Sauce non trouvé !"),
+      });
+    }
+    if (sauce.userId !== req.auth.userId) {
+      res.status(400).json({
+        error: new Error("Requête non autorisé !"),
+      });
+    }
+    Sauce.deleteOne({ _id: req.params.id })
+      .then(() => {
+        res.status(200).json({
+          message: "Sauce supprimé !",
+        });
+      })
+      .catch((error) => {
+        res.status(400).json({
+          error: error,
+        });
+      });
+  });
+};
+
 //GET ONE
 exports.getOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })

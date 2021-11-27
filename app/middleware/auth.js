@@ -17,6 +17,8 @@ module.exports = (req, res, next) => {
     //quand on décode le token cela devient un objet JS
     // donc on va pouvoir récupérer le userId qui est dedans
     const userId = decodedToken.userId;
+    //nous ajoutons un objet  auth  à l'objet de requête qui contient le  userId  extrait du token
+    req.auth = { userID: userId };
     //si jamais il y a un userId dans le corp de la requete on veut vérifier que cela correspond bien a celle du token
     //dans le if c'est si cela ne correspond pas
     if (req.body.userId && req.body.userId !== userId) {
