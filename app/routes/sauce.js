@@ -13,7 +13,7 @@ router.post("/", auth, sauceCtrl.createSauce);
 router.put("/:id", auth, sauceCtrl.modifySauce);
 
 //DELETE
-router.delete("/:id",auth, stuffCtrl.deleteSauce);
+router.delete("/:id",auth, sauceCtrl.deleteSauce);
 
 //GET pour un seul objet
 router.get("/:id", auth, sauceCtrl.getOneSauce);
