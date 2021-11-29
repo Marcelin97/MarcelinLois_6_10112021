@@ -4,10 +4,15 @@ const express = require("express");
 //on importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
 const bodyParser = require("body-parser");
 
-//j'importe ma BDD qui est dans le fichier db.config.js
-const mongoose = require("./config/db.config");
+//Envoi le contenu du fichier .env dans l'object process.env
+require("dotenv").config();
 
+//j'importe ma BDD qui est dans le fichier db.config.js
+require("./config/db.config");
+
+//j'importe mes routes qui sont mtn dans mon index.js
 const router = require("./app/routes/index");
+
 //on crée une constante app qui est notre application. 
 //On appel la méthode express ce qui permet de crée une application express
 const app = express();
@@ -26,7 +31,7 @@ app.use(cors(corsOptions));
 /////////////////// middleware CORS
 //=================================>
 
-//On exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
+//exportons notre variable d'application afin qu'elle puisse être importée et utilisée dans d'autres fichiers.
 //Notamment depuis notre serveur node.
 module.exports = app;
 
@@ -38,9 +43,10 @@ app.use(bodyParser.json());
 //on récupère nos routes qui est l'index.js, appelé router.
 app.use("/api", router);
 
+const PORT = process.env.PORT || 3000;
 
-app.listen(3000, () => {
-  console.log("server is listening on port 3000");
+app.listen(PORT, () => {
+  console.log("server is listening on port" + " " + PORT + " " + "...");
 });
 // //paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
 // app.use(session({

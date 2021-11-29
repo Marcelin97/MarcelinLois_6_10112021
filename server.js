@@ -1,4 +1,5 @@
-const http = require('http');
+//Chargement du module HTTP
+const https = require('https');
 
 //on importe notre application, pour importé le app.js qui est dans le même dossier.
 const app = require('./app');
@@ -44,7 +45,7 @@ const errorHandler = (error) => {
 };
 
 //on passe à notre serveur notre application.
-const server = http.createServer(app);
+const server = https.createServer(app);
 
 //un écouteur d'évènements est également enregistré, consignant le port ou 
 //le canal nommé sur lequel le serveur s'exécute dans la console.
@@ -55,4 +56,5 @@ server.on("listening", () => {
   console.log("Listening on " + bind);
 });
 
+//Le serveur va attendre et lire les requêtes qui arriveront sur le port 3000.
 server.listen(port);
