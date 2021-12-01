@@ -21,12 +21,7 @@ const app = express();
 /////////////////// middleware CORS
 //=================================>
 const cors = require("cors");
-
-var corsOptions = {
-  origin: "http://localhost:3000",
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 //=================================>
 /////////////////// middleware CORS
 //=================================>
