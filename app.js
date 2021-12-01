@@ -52,6 +52,8 @@ app.listen(PORT, () => {
 // app.use(session({
 //   secret: "s3cur3"
 //   cookie: {
+  ////Les attaques cross-site scripting ou XSS 
+//     flag:true,
 //     secure: true,
 //     httponly: true,
 //     domain: 'http://localhost:3000'

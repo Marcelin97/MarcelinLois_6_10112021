@@ -24,8 +24,8 @@ exports.modifySauce = (req, res, next) => {
       });
     })
     .catch((error) => {
-      res.status(400).json({
-        error: error,
+      res.status(403).json({
+        error: "Requête non autorisé !",
       });
     });
 };
@@ -71,17 +71,6 @@ exports.getAllSauces = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
-// //LIKE || DISLIKE
-// exports.likeOneSauce = (req, res, next) => {
-//   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
-//     if (req.body.like === 1 && !usersLiked.includes(req.body.userId)) {
-//       sauce
-//         .updateOne({ _id: req.params.id })
-//         .then(() => res.status(200).json({ message: "sauce liked" }))
-//         .catch((error) => res.status(400).json({ error }));
-//     }
-//   });
-// };
 
 //LIKE || DISLIKE
 exports.likeSauce = (req, res, next) => {
@@ -97,24 +86,64 @@ exports.likeSauce = (req, res, next) => {
   }
 
   Sauce.findById(req.params.id).then(async (sauce) => {
-    // Like
-    //If user like
     switch (parseInt(like)) {
+      //If user like
       case 1:
+        message = `La sauce est déjà aimée`;
+        //If this user already dislike the sauce
         if (sauce.usersDisliked.includes(userId)) {
-          sauce.likes--
-          sauce.usersDisliked.splice(
-            sauce.usersDisliked.indexOf(userId),
-            1,
-          );
+          //enlève 1 dislike
+          sauce.dislikes--;
+          //the user's Id is removed from the dislike array
+          sauce.usersDisliked.splice(sauce.usersDisliked.indexOf(userId), 1);
         }
+        //and pushed into the like array
         sauce.usersLiked.push(userId);
-        sauce.likes++
+        //ajoute 1 like
+        sauce.likes++;
+        message: `Sauce ajouter à la liste des "j'aime"`;
         break;
+
+      // if it's nolike/nodislike
       case 0:
+        message = `La sauce n'était pas déjà aimée ou détestée`;
+        //If the user already like the sauce
+        if (sauce.usersLiked.includes(userId)) {
+          sauce.likes--;
+          //remove the user from the like array
+          sauce.usersLiked.splice(sauce.usersLiked.indexOf(req.body.userId), 1);
+          message: `Sauce retirer de la liste des "j'aime"`;
+          //If the user already dislike
+        } else if (sauce.usersDisliked.includes(userId)) {
+          sauce.dislikes--;
+          // remove the user from the dislike array
+          sauce.usersDisliked.splice(sauce.usersDisliked.indexOf(userId), 1);
+          message: `Sauce retirer de la liste "je n'aime pas"`;
+        }
         break;
+
+      // if it's a dislike
       case -1:
+        message = `La sauce est déjà détestée`;
+        // if the user already like the sauce
+        if (sauce.usersLiked.includes(userId)) {
+          sauce.likes--;
+          sauce.usersLiked.push(userId);
+          // If the sauce is not already disliked by the user
+        }
+        sauce.usersDisliked.push(userId);
+        sauce.dislikes++;
+        message: `Sauce ajouter à la liste des "je n'aime pas"`;
+        break;
+      default:
         break;
     }
+
+    // Save the sauce and return a message
+    Sauce.updateOne({ _id: sauce._id })
+      .then(() =>
+        res.status(200).json({ message: "Votre avis a été mise à jour ! " })
+      )
+      .catch((error) => res.status(400).json({ error }));
   });
 };
