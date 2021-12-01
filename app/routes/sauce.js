@@ -21,5 +21,8 @@ router.get("/:id", auth, sauceCtrl.getOneSauce);
 //GET ALL
 router.get("/", auth, sauceCtrl.getAllSauces);
 
+//LIKE
+router.get("/:id/like", auth, sauceCtrl.likeSauce);
+
 //on exporte le router de ce fichier
 module.exports = router;
