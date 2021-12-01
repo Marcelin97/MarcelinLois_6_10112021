@@ -1,28 +1,41 @@
 const express = require("express");
 const router = express.Router();
 
+//on importe nos controllers pour les sauces
 const sauceCtrl = require("../controllers/sauce")
 
 //middleware d'authentification que nous appliquerons à nos routes pour les protégés
 const auth = require("../middleware/auth");
 
-//POST
+//=================================>
+/////////////////// Create sauce
+//=================================>
 router.post("/", auth, sauceCtrl.createSauce);
 
-//PUT
+//=================================>
+/////////////////// Update sauce
+//=================================>
 router.put("/:id", auth, sauceCtrl.modifySauce);
 
-//DELETE
+//=================================>
+/////////////////// Delete sauce
+//=================================>
 router.delete("/:id",auth, sauceCtrl.deleteSauce);
 
-//GET pour un seul objet
+//=================================>
+/////////////////// Get one sauce
+//=================================>
 router.get("/:id", auth, sauceCtrl.getOneSauce);
 
-//GET ALL
+//=================================>
+/////////////////// Get all sauces
+//=================================>
 router.get("/", auth, sauceCtrl.getAllSauces);
 
-//LIKE
-router.get("/:id/like", auth, sauceCtrl.likeSauce);
+//=================================>
+/////////////////// Like sauce
+//=================================>
+router.post("/:id/like", auth, sauceCtrl.likeSauce);
 
 //on exporte le router de ce fichier
 module.exports = router;

@@ -9,7 +9,16 @@ const verifyPassword = require("../middleware/verifyPassword")
 
 //on crée deux routes
 //ce sont des routes post car le front va également envoyé des informations
+
+//=================================>
+/////////////////// SIGNUP
+//=================================>
 router.post("/signup", verifyPassword, userCtrl.signup);
+
+//=================================>
+/////////////////// LOGIN
+//=================================>
 router.post("/login", verifyPassword, userCtrl.login);
 
+//on exporte le router de ce fichier
 module.exports = router;

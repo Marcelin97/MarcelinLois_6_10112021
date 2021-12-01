@@ -1,6 +1,9 @@
+//on importe notre modèle sauce
 const Sauce = require("../models/sauce");
 
-//POST
+//=================================>
+/////////////////// Create sauce
+//=================================>
 exports.createSauce = (req, res, next) => {
   //supprime l'ID envoyé par le front
   delete req.body._id;
@@ -15,7 +18,9 @@ exports.createSauce = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
-//PUT
+//=================================>
+/////////////////// Update sauce
+//=================================>
 exports.modifySauce = (req, res, next) => {
   Sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
     .then(() => {
@@ -30,7 +35,9 @@ exports.modifySauce = (req, res, next) => {
     });
 };
 
-//DELETE
+//=================================>
+/////////////////// Delete sauce
+//=================================>
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     if (!sauce) {
@@ -57,14 +64,18 @@ exports.deleteSauce = (req, res, next) => {
   });
 };
 
-//GET ONE
+//=================================>
+/////////////////// Get one sauce
+//=================================>
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => res.status(200).json(sauce))
     .catch((error) => res.status(404).json({ error }));
 };
 
-//GET ALL
+//=================================>
+/////////////////// Get all sauces
+//=================================>
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => res.status(200).json(sauces))
@@ -72,7 +83,9 @@ exports.getAllSauces = (req, res, next) => {
 };
 
 
-//LIKE || DISLIKE
+//================================>
+/////////////////// LIKE // DISLIKE
+//=================================>
 exports.likeSauce = (req, res, next) => {
   // Params
   let userId = req.body.userId;

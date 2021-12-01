@@ -1,7 +1,6 @@
 //on a besoin de notre package pour vérifier les tokens
 const jwt = require("jsonwebtoken");
 
-//on exporte un middleware
 //on utilise des blocs try catch, car il y a plusieurs éléments qui peuvent posé problème
 module.exports = (req, res, next) => {
   try {

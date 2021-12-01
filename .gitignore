@@ -1,4 +1,4 @@
 node_modules
 .vscode
 config/db.config.js
-config.env
+.env
