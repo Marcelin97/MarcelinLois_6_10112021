@@ -44,9 +44,12 @@ app.listen(PORT, () => {
   console.log("server is listening on port" + " " + PORT + " " + "...");
 });
 
-//paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
+//=================================>
+///////// Express Session Middleware
+//=================================>
 const session = require("express-session");
 
+//paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
 app.use(
   session({
     secret: "s3cur3",
@@ -54,10 +57,22 @@ app.use(
     saveUninitialized: true,
     cookie: {
       //Les attaques cross-site scripting ou XSS
-      flag: true,
       secure: true,
       httponly: true,
       domain: "http://localhost:3000",
     },
   })
 );
+//=================================>
+///////// Express Session Middleware
+//=================================>
+
+//=================================>
+//Set some secure headers with helmet.js
+//=================================>
+//module that helps secure your applications by setting various HTTP headers.
+const helmet = require("helmet");
+app.use(helmet());
+//=================================>
+//Set some secure headers with helmet.js
+//=================================>
