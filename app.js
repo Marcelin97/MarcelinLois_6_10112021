@@ -43,14 +43,21 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("server is listening on port" + " " + PORT + " " + "...");
 });
-// //paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
-// app.use(session({
-//   secret: "s3cur3"
-//   cookie: {
-  ////Les attaques cross-site scripting ou XSS 
-//     flag:true,
-//     secure: true,
-//     httponly: true,
-//     domain: 'http://localhost:3000'
-//   }
-// }));
+
+//paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
+const session = require("express-session");
+
+app.use(
+  session({
+    secret: "s3cur3",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      //Les attaques cross-site scripting ou XSS
+      flag: true,
+      secure: true,
+      httponly: true,
+      domain: "http://localhost:3000",
+    },
+  })
+);
