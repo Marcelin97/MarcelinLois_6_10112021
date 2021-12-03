@@ -62,7 +62,7 @@ app.use(
       secure: true,
       httponly: true,
       domain: "http://localhost:3000",
-      expires: expiryDate,
+      // expires: expiryDate,
     },
   })
 );
