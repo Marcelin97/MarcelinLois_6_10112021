@@ -10,6 +10,8 @@ require("dotenv").config();
 //j'importe ma BDD qui est dans le fichier db.config.js
 require("./config/db.config");
 
+const path = require("path");
+
 //j'importe mes routes qui sont mtn dans mon index.js
 const router = require("./app/routes/index");
 
@@ -38,11 +40,20 @@ app.use(bodyParser.json());
 //on récupère nos routes qui est l'index.js, appelé router.
 app.use("/api", router);
 
+// Serve static files
+app.use("/images/", express.static(path.join(__dirname, "images")));
+
+//=================================>
+////////////////// Start application
+//=================================>
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log("server is listening on port" + " " + PORT + " " + "...");
 });
+//=================================>
+////////////////// Start application
+//=================================>
 
 //=================================>
 ///////// Express Session Middleware
