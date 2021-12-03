@@ -50,9 +50,11 @@ app.listen(PORT, () => {
 const session = require("express-session");
 
 //paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
+app.set('trust proxy', 1) // trust first proxy
 app.use(
   session({
     secret: "s3cur3",
+    name: "sessionId",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -60,6 +62,7 @@ app.use(
       secure: true,
       httponly: true,
       domain: "http://localhost:3000",
+      expires: expiryDate,
     },
   })
 );
