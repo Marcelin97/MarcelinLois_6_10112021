@@ -14,17 +14,17 @@ const userSchema = mongoose.Schema({
     email: {
         type: String,
         require: true,
-        unique: true,
-        validate(value){
-            if (!validator.isEmail(value)) {
-                throw new Error('E-mail invalide')
-            }
-        }
+        unique: [true, "Email is required"],
+        // validate(value){
+        //     if (!validator.isEmail(value)) {
+        //         throw new Error('E-mail invalide')
+        //     }
+        // }
     },
     password: {
         type: String,
-        require: true,
-        minLength: 8,
+        require: [true, "Password is required"],
+        minLength: [8, "Password can't be shorter than 8 characters"],
         minLowercase: 1,
         minUppercase: 1,
         minNumbers: 1,

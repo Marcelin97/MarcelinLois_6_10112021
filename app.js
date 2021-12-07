@@ -43,6 +43,11 @@ app.use("/api", router);
 // Serve static files
 app.use("/images/", express.static(path.join(__dirname, "images")));
 
+//error handling middleware
+app.use(function (err, req, res, next) {
+  // console.log(err);
+  res.status(422).send({ error: err.message })
+});
 //=================================>
 ////////////////// Start application
 //=================================>

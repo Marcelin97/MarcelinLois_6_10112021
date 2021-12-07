@@ -2,19 +2,21 @@
 const Sauce = require("../models/sauce");
 
 //pour avoir accès aux différentes fonction lié a la gestion des fichiers
-const fs = require('fs');
+const fs = require("fs");
 
 //=================================>
 /////////////////// Create sauce
 //=================================>
 exports.createSauce = (req, res, next) => {
-  const sauceObject = JSON.parse(req.body.sauce)
+  const sauceObject = JSON.parse(req.body.sauce);
   //supprime l'ID envoyé par le front
   delete sauceObject._id;
   const sauce = new Sauce({
     //l"opérateur spread ... permet de copier les champs qu'il y a dans la body de la requête
     ...sauceObject,
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    imageUrl: `${req.protocol}://${req.get("host")}/images/${
+      req.file.filename
+    }`,
   });
   //on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
@@ -35,7 +37,10 @@ exports.updateSauce = (req, res, next) => {
         }`,
       }
     : { ...req.body };
-  Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+  Sauce.updateOne(
+    { _id: req.params.id },
+    { ...sauceObject, _id: req.params.id }
+  )
     .then(() => {
       res.status(200).json({
         message: "Sauce mise à jour avec succès !!",
@@ -97,22 +102,26 @@ exports.likeSauce = (req, res, next) => {
     });
   }
 
+function usersDislikes() {
+    //enlève 1 dislike
+    sauce.dislikes--;
+    //the user's Id is removed from the dislike array
+    sauce.usersDisliked.splice(sauce.usersDisliked.indexOf(userId), 1);
+  };
+
   Sauce.findById(req.params.id).then(async (sauce) => {
     switch (parseInt(like)) {
       //If user like
       case 1:
         //If this user already dislike the sauce
         if (sauce.usersDisliked.includes(userId)) {
-          //enlève 1 dislike
-          sauce.dislikes--;
-          //the user's Id is removed from the dislike array
-          sauce.usersDisliked.splice(sauce.usersDisliked.indexOf(userId), 1);
+          usersDislikes();
         }
         //and pushed into the like array
         sauce.usersLiked.push(userId);
         //ajoute 1 like
         sauce.likes++;
-        message= `Sauce ajouter à la liste des "j'aime"`;
+        message = `Sauce ajouter à la liste des "j'aime"`;
         break;
 
       // if it's nolike/nodislike
@@ -122,13 +131,11 @@ exports.likeSauce = (req, res, next) => {
           sauce.likes--;
           //remove the user from the like array
           sauce.usersLiked.splice(sauce.usersLiked.indexOf(req.body.userId), 1);
-          message= `Sauce retirer de la liste des "j'aime"`;
+          message = `Sauce retirer de la liste des "j'aime"`;
           //If the user already dislike
         } else if (sauce.usersDisliked.includes(userId)) {
-          sauce.dislikes--;
-          // remove the user from the dislike array
-          sauce.usersDisliked.splice(sauce.usersDisliked.indexOf(userId), 1);
-          message= `Sauce retirer de la liste "je n'aime pas"`;
+          usersDislikes();
+          message = `Sauce retirer de la liste "je n'aime pas"`;
         }
         break;
 
@@ -142,7 +149,7 @@ exports.likeSauce = (req, res, next) => {
         }
         sauce.usersDisliked.push(userId);
         sauce.dislikes++;
-        message= `Sauce ajouter à la liste des "je n'aime pas"`;
+        message = `Sauce ajouter à la liste des "je n'aime pas"`;
         break;
       default:
         break;
@@ -151,7 +158,7 @@ exports.likeSauce = (req, res, next) => {
     // Save the sauce and return a message
     Sauce.updateOne({ _id: sauce._id })
       .then(() =>
-        res.status(200).json({ message: "Votre avis a été mise à jour ! " })
+        res.status(200).json({ message })
       )
       .catch((error) => res.status(400).json({ error }));
   });

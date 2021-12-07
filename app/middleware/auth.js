@@ -30,6 +30,6 @@ module.exports = (req, res, next) => {
   } catch (error) {
     //on renvoi une erreur 401 pour une erreur d'authentification
     //et dans le json si on reçoit une erreur on veut l'envoyé sinon cela envoi un message
-    res.status(401).json({ error: error | "Requête non authentifiée" });
+    res.status(401).json({ error: error || "Requête non authentifiée" });
   }
 };
