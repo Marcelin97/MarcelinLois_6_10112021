@@ -10,6 +10,7 @@ require("dotenv").config();
 //j'importe ma BDD qui est dans le fichier db.config.js
 require("./config/db.config");
 
+//accéder au path de notre serveur
 const path = require("path");
 
 //j'importe mes routes qui sont mtn dans mon index.js
@@ -43,11 +44,12 @@ app.use("/api", router);
 // Serve static files
 app.use("/images/", express.static(path.join(__dirname, "images")));
 
-//error handling middleware
-app.use(function (err, req, res, next) {
-  // console.log(err);
-  res.status(422).send({ error: err.message })
-});
+// //error handling middleware
+// app.use(function (err, req, res, next) {
+//   // console.log(err);
+//   res.status(422).send({ error: error.message })
+// });
+
 //=================================>
 ////////////////// Start application
 //=================================>
@@ -67,12 +69,10 @@ const session = require("express-session");
 
 //paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
 app.set('trust proxy', 1) // trust first proxy
-app.use(
-  session({
-    secret: "s3cur3",
-    name: "sessionId",
+app.use(session({
+    secret: "keyboard cat",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
       //Les attaques cross-site scripting ou XSS
       secure: true,

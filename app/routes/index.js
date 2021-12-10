@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 
 //on importe nos routes
-// const stuffRoutes = require("./routes/stuff");
 const userRoutes = require("./user");
 const sauceRoutes = require("./sauce");
 

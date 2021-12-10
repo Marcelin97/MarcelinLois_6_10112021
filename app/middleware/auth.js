@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
     //la seconde étape et de décoder le token
     //on va utiliser le package jsonwebtoken et la fonction verify
     //(on vérifie le token et on veut vérifier la clé secrete)
-    const decodedToken = jwt.verify(token, "RANDOM_TOKEN_SECRET");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
     //quand on décode le token cela devient un objet JS
     // donc on va pouvoir récupérer le userId qui est dedans
     const userId = decodedToken.userId;

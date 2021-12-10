@@ -1,7 +1,6 @@
-//on importe notre modèle sauce
+// Import our sauce model
 const Sauce = require("../models/sauce");
-
-//pour avoir accès aux différentes fonction lié a la gestion des fichiers
+// Import the filesystem module
 const fs = require("fs");
 
 //=================================>
@@ -9,19 +8,19 @@ const fs = require("fs");
 //=================================>
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
-  //supprime l'ID envoyé par le front
+  // supprime l'ID envoyé par le front
   delete sauceObject._id;
   const sauce = new Sauce({
-    //l"opérateur spread ... permet de copier les champs qu'il y a dans la body de la requête
+    // l"opérateur spread ... permet de copier les champs qu'il y a dans la body de la requête
     ...sauceObject,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
-    }`,
+    }`
   });
-  //on utilise la méthode .save pour sauvegarder dans la BDD
+  // on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
     .save()
-    .then(() => res.status(201).json({ message: "Sauce enregistré !" }))
+    .then(() => res.status(201).json({ message: "Sauce saved !" }))
     .catch((error) => res.status(400).json({ error }));
 };
 
@@ -43,12 +42,12 @@ exports.updateSauce = (req, res, next) => {
   )
     .then(() => {
       res.status(200).json({
-        message: "Sauce mise à jour avec succès !!",
+        message: "Sauce updated !!",
       });
     })
     .catch((error) => {
       res.status(403).json({
-        error: "Requête non autorisé !",
+        error: "Request not allowed !",
       });
     });
 };
@@ -62,7 +61,7 @@ exports.deleteSauce = (req, res, next) => {
       const filename = sauce.imageUrl.split("/images/")[1];
       fs.unlink(`images/${filename}`, () => {
         Sauce.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: "Sauce supprimé !" }))
+          .then(() => res.status(200).json({ message: "Sauce deleted !" }))
           .catch((error) => res.status(400).json({ error }));
       });
     })
@@ -75,7 +74,9 @@ exports.deleteSauce = (req, res, next) => {
 exports.readOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => res.status(200).json(sauce))
-    .catch((error) => res.status(404).json({ error }));
+    .catch((error) =>
+      res.status(404).json({ message: "Sauce not found" })
+    );
 };
 
 //=================================>
@@ -83,7 +84,15 @@ exports.readOneSauce = (req, res, next) => {
 //=================================>
 exports.readAllSauces = (req, res, next) => {
   Sauce.find()
-    .then((sauces) => res.status(200).json(sauces))
+    .then((sauces) => {
+      if (sauces.length <= 0) {
+        return res.status(404).json({
+          error: "No sauces to display",
+        });
+      } else {
+        res.status(200).json(sauces);
+      }
+    })
     .catch((error) => res.status(400).json({ error }));
 };
 
@@ -98,44 +107,49 @@ exports.likeSauce = (req, res, next) => {
   //on vérifie que la sauce existe bien
   if (!sauce) {
     res.status(404).json({
-      error: new Error("Cette sauce n'existe pas !"),
+      error: new Error ("This sauce does not exist !")
     });
   }
 
-function usersDislikes() {
-    //enlève 1 dislike
+function removeDislikes() {
+    //remove 1 dislike
     sauce.dislikes--;
     //the user's Id is removed from the dislike array
     sauce.usersDisliked.splice(sauce.usersDisliked.indexOf(userId), 1);
   };
 
+  function removeLike() {
+    //remove 1 like
+    sauce.likes--;
+    //the user's Id is removed from the like array
+    sauce.usersLiked.splice(sauce.usersLiked.indexOf(req.body.userId), 1);
+  };
+  
   Sauce.findById(req.params.id).then(async (sauce) => {
-    switch (parseInt(like)) {
+    switch (like) {
       //If user like
       case 1:
         //If this user already dislike the sauce
         if (sauce.usersDisliked.includes(userId)) {
-          usersDislikes();
-        }
+          removeDislikes();
+        };
         //and pushed into the like array
         sauce.usersLiked.push(userId);
-        //ajoute 1 like
+        //add 1 like
         sauce.likes++;
-        message = `Sauce ajouter à la liste des "j'aime"`;
+        // message = `Sauce add to the "likes" list`;
         break;
 
       // if it's nolike/nodislike
       case 0:
         //If the user already like the sauce
         if (sauce.usersLiked.includes(userId)) {
-          sauce.likes--;
-          //remove the user from the like array
-          sauce.usersLiked.splice(sauce.usersLiked.indexOf(req.body.userId), 1);
-          message = `Sauce retirer de la liste des "j'aime"`;
+          removeLike();
+          // message = `Sauce remove from the "likes" list"`;
           //If the user already dislike
         } else if (sauce.usersDisliked.includes(userId)) {
-          usersDislikes();
-          message = `Sauce retirer de la liste "je n'aime pas"`;
+          removeDislikes();
+          // message = `Sauce remove from "I don't like" list`;
         }
         break;
 
@@ -143,13 +157,12 @@ function usersDislikes() {
       case -1:
         // if the user already like the sauce
         if (sauce.usersLiked.includes(userId)) {
-          sauce.likes--;
-          sauce.usersLiked.push(userId);
+          removeLike();
           // If the sauce is not already disliked by the user
-        }
+        };
         sauce.usersDisliked.push(userId);
         sauce.dislikes++;
-        message = `Sauce ajouter à la liste des "je n'aime pas"`;
+        // message = `Sauce add to dislike list"`;
         break;
       default:
         break;
@@ -158,7 +171,7 @@ function usersDislikes() {
     // Save the sauce and return a message
     Sauce.updateOne({ _id: sauce._id })
       .then(() =>
-        res.status(200).json({ message })
+        res.status(200).json({ message: "The sauce has been updated" })
       )
       .catch((error) => res.status(400).json({ error }));
   });

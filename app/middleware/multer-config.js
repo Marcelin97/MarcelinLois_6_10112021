@@ -4,7 +4,7 @@ const multer = require("multer");
 //le dictionnaire des mime types
 const MIME_TYPES = {
   "image/jpg": "jpg",
-  "image/jpeg": "jpeg",
+  "image/jpeg": "jpg",
   "image/png": "png",
 };
 
@@ -33,4 +33,4 @@ const storage = multer.diskStorage({
 //on exporte notre middleware multer complètement configurer
 //on appel la méthode multer, a laquelle on passe notre objet storage, on applique la méthode single pour dire que c'est des fichiers unique
 //et on explique a multer qu'il s'agit de fichier image uniquement
-module.exports = multer({ storage }).single("image");
+module.exports = multer({ storage: storage }).single("image");

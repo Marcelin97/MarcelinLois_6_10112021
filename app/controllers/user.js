@@ -33,7 +33,7 @@ const errorFormater = e => {
 
 exports.signup = (req, res, next) => {
   //la première choses on Hash le mot de pass (c'est une fonction asynchrone qui prends du temps) pour le crypter
-  //on appel la fonction bcrypt.hash pour crypter un MDP(on lui passe le MDP du corp de la requête, le solt c'est combien de fois on execute l'algo de hashage)
+  //on appel la fonction bcrypt.hash pour crypter un MDP(on lui passe le MDP du corp de la requête, le salt c'est combien de fois on execute l'algo de hashage)
   bcrypt
     .hash(req.body.password, 10)
     //comme c'est une méthode asynchrone on a then et un catch
@@ -50,13 +50,15 @@ exports.signup = (req, res, next) => {
       user
         .save()
         //on renvoi un 201 pour une création de ressource et on renvoi un message en objet
-        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
+        .then(() => res.status(201).json({ message: "User created!" }))
         //on capte une erreur en 400
-        .catch((error) => res.status(400).json({
-          message: "Quelque chose s'est mal passé.",
-          case: "VALIDATION ERROR",
-          debugInfo: errorFormater(error.message)
-        }));
+        .catch((error) =>
+          res.status(400).json({
+            message: "Something went wrong.",
+            case: "VALIDATION ERROR",
+            debugInfo: errorFormater(error.message),
+          })
+        );
     })
     //on capte l'erreur que l'on renvoi dans un objet
     .catch((error) => res.status(500).json({ error }));
@@ -76,7 +78,7 @@ exports.login = (req, res, next) => {
       //si on a pas trouvé de user
       if (!user) {
         //on renvoi un 401 avec notre propre message
-        return res.status(401).json({ error: "Utilisateur non trouvé !" });
+        return res.status(401).json({ error: "User not found!" });
         }
         //si on arrive ici c'est qu'on a trouvé un utilisateur
       //on utilise bcrypt pour comparer le MDP envoyé par l'utilisateur qui essai de se connecter avec le user qu'on a reçu de la BDD
@@ -87,15 +89,15 @@ exports.login = (req, res, next) => {
           //on créer un boolean
           //si la comparaison n'est pas bonne - si le MDP n'est pas le meme
           if (!valid) {
-            return res.status(401).json({ error: "Mot de passe incorrect !" });
+            return res.status(401).json({ error: "Incorrect password !" });
           }
           //si le MDP est le bon l'utilisateur reçoit
           //son user id et son token d'identification
           res.status(200).json({
             userId: user._id,
-            //nous utilisons une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour encoder notre token 
+            //nous utilisons une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour encoder notre token
             //(à remplacer par une chaîne aléatoire beaucoup plus longue pour la production) ;
-            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+            token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
               //L'utilisateur devra donc se reconnecter au bout de 24 heures
               expiresIn: "24h",
             }),
