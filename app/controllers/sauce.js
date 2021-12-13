@@ -99,85 +99,11 @@ exports.readAllSauces = (req, res, next) => {
 //================================>
 /////////////////// LIKE // DISLIKE
 //=================================>
-// exports.likeSauce = (req, res, next) => {
-//   // Params
-//   let userId = req.body.userId;
-//   let like = req.body.like;
-
-//   // //on vérifie que la sauce existe bien
-//   // if (!sauce) {
-//   //   res.status(404).json({
-//   //     error: new Error ("This sauce does not exist !")
-//   //   });
-//   // }
-  
-//   Sauce.findById(req.params.id)
-//     .then(async (sauce) => {
-//     switch (req.body.like) {
-//       //If user like
-//       case 1:
-//         //If this user already dislike the sauce
-//         if (sauce.usersDisliked.includes(userId)) {
-//           removeDislikes();
-//         } else {
-//           //and pushed into the like array
-//           sauce.usersLiked.push(userId);
-//           //add 1 like
-//           sauce.likes++;
-//         }
-//         // message = `Sauce add to the "likes" list`;
-//         break;
-
-//       // if it's nolike/nodislike
-//       case 0:
-//         //If the user already like the sauce
-//         if (sauce.usersLiked.includes(userId)) {
-//           removeLike();
-//           // message = `Sauce remove from the "likes" list"`;
-//           //If the user already dislike
-//         } else if (sauce.usersDisliked.includes(userId)) {
-//           removeDislikes();
-//           // message = `Sauce remove from "I don't like" list`;
-//         }
-//         break;
-
-//       // if it's a dislike
-//       case -1:
-//         // if the user already like the sauce
-//         if (sauce.usersLiked.includes(userId)) {
-//           removeLike();
-//           // If the sauce is not already disliked by the user
-//         } else {
-//           sauce.usersDisliked.push(userId);
-//           sauce.dislikes++;
-//           // message = `Sauce add to dislike list"`;
-//         }
-//         break;
-//       default:
-//         break;
-//     }
-
-//     // Save the sauce and return a message
-//     Sauce.findByIdAndUpdate({ _id: sauce._id })
-//       .then(() =>
-//         res.status(200).json({ message })
-//       )
-//       .catch((error) => res.status(400).json({ error }));
-//   });
-// };
-
-
 exports.likeSauce = (req, res, next) => {
   // Params
   let userId = req.body.userId;
   let like = req.body.like;
 
-  // //on vérifie que la sauce existe bien
-  // if (!sauce) {
-  //   res.status(404).json({
-  //     error: new Error("This sauce does not exist !"),
-  //   });
-  // }
 
   function removeDislike() {
       //remove 1 dislike
@@ -195,6 +121,14 @@ exports.likeSauce = (req, res, next) => {
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
+
+        //on vérifie que la sauce existe bien
+  if (!sauce) {
+    return res.status(404).json({
+      error: new Error("This sauce does not exist !"),
+    });
+      };
+      
       switch (like) {
         // If it is a like
         case 1:
