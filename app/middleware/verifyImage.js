@@ -11,16 +11,25 @@ const multer = require("multer");
 //     // Everything went fine.
 //   })
 
-//verify extension name
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-    cb(null, true);
-  } else {
-    cb(new Error("Invalid Mime Type, only JPEG or PNG"), false);
-  }
-};
+module.exports = (req, res, next) => {
 
-let upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-});
+  //verify if request contain file
+  try {
+  } catch (error) {
+    res.status(401).json({ error: error || "Requête non authentifiée" });
+  }
+
+  //verify extension name
+  const fileFilter = (req, file, cb) => {
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid Mime Type, only JPEG or PNG"), false);
+    }
+  };
+
+  let upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+  });
+}

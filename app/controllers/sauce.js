@@ -15,7 +15,7 @@ exports.createSauce = (req, res, next) => {
     ...sauceObject,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
-    }`
+    }`,
   });
   // on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
@@ -74,9 +74,7 @@ exports.deleteSauce = (req, res, next) => {
 exports.readOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => res.status(200).json(sauce))
-    .catch((error) =>
-      res.status(404).json({ message: "Sauce not found" })
-    );
+    .catch((error) => res.status(404).json({ message: "Sauce not found" }));
 };
 
 //=================================>
@@ -104,31 +102,29 @@ exports.likeSauce = (req, res, next) => {
   let userId = req.body.userId;
   let like = req.body.like;
 
-
   function removeDislike() {
-      //remove 1 dislike
-      // sauce.dislikes--;
-      //the user's Id is removed from the dislike array
-      sauce["usersDisliked"].splice(sauce["usersDisliked"].indexOf(userId),1);
-    };
+    //remove 1 dislike
+    // sauce.dislikes--;
+    //the user's Id is removed from the dislike array
+    sauce["usersDisliked"].splice(sauce["usersDisliked"].indexOf(userId), 1);
+  }
 
-    function removeLike() {
-      //remove 1 like
-      // sauce.likes--;
-      //the user's Id is removed from the like array
-      sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId),1);
-    };
+  function removeLike() {
+    //remove 1 like
+    // sauce.likes--;
+    //the user's Id is removed from the like array
+    sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId), 1);
+  }
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
+      //on vérifie que la sauce existe bien
+      if (!sauce) {
+        return res.status(404).json({
+          error: new Error("This sauce does not exist !"),
+        });
+      }
 
-        //on vérifie que la sauce existe bien
-  if (!sauce) {
-    return res.status(404).json({
-      error: new Error("This sauce does not exist !"),
-    });
-      };
-      
       switch (like) {
         // If it is a like
         case 1:
@@ -152,7 +148,7 @@ exports.likeSauce = (req, res, next) => {
           // If the user already like the sauce
           if (sauce["usersLiked"].includes(userId)) {
             // remove the user from the like array
-            sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId),1);
+            sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId), 1);
             // if the user already dislike
           } else if (sauce["usersDisliked"].includes(userId)) {
             // remove the user from the dislike array
