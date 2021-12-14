@@ -22,15 +22,25 @@ const storage = multer.diskStorage({
     //qui remplace les espaces par des underscores
     const name = file.originalname.split(" ").join("_");
     //on applique une extension au fichier
-    //le mimetype c'est jpg, jpeg, png
-    //voir le dictionnaire au dessus
-    //on créer une extension qui reprends notre dictionnaire
+    //le mime_type: jpg, jpeg, png
+    //on crée une extension qui reprends notre dictionnaire
     const extension = MIME_TYPES[file.mimetype];
     callback(null, name + Date.now() + "." + extension);
   },
 });
 
+//verify extension name
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    cb(null, true);
+  } else {
+    cb(new Error("Invalid Mime Type, only JPEG or PNG"), false);
+  }
+};
+
 //on exporte notre middleware multer complètement configurer
 //on appel la méthode multer, a laquelle on passe notre objet storage, on applique la méthode single pour dire que c'est des fichiers unique
 //et on explique a multer qu'il s'agit de fichier image uniquement
-module.exports = multer({ storage: storage }).single("image");
+module.exports = multer({ storage: storage, fileFilter: fileFilter }).single(
+  "image"
+);

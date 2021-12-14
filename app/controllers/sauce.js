@@ -7,7 +7,15 @@ const fs = require("fs");
 /////////////////// Create sauce
 //=================================>
 exports.createSauce = (req, res, next) => {
+  // Check if request contain files uploaded
+  if (!req.body || !req.file) {
+    return res.status(401).json({
+      message: "Your request does not contain an image.",
+    });
+  }
+
   const sauceObject = JSON.parse(req.body.sauce);
+
   // supprime l'ID envoyé par le front
   delete sauceObject._id;
   const sauce = new Sauce({
@@ -102,24 +110,16 @@ exports.likeSauce = (req, res, next) => {
   let userId = req.body.userId;
   let like = req.body.like;
 
-  function removeDislike() {
-    //remove 1 dislike
-    // sauce.dislikes--;
-    //the user's Id is removed from the dislike array
-    sauce["usersDisliked"].splice(sauce["usersDisliked"].indexOf(userId), 1);
-  }
+function changeLike(sauce, state, userId) {
+  sauce["usersDisliked"].splice(sauce["usersDisliked"].indexOf(userId), 1);
+}
 
-  function removeLike() {
-    //remove 1 like
-    // sauce.likes--;
-    //the user's Id is removed from the like array
-    sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId), 1);
-  }
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
+
       //on vérifie que la sauce existe bien
-      if (!sauce) {
+      if (!Sauce) {
         return res.status(404).json({
           error: new Error("This sauce does not exist !"),
         });
@@ -136,11 +136,10 @@ exports.likeSauce = (req, res, next) => {
                 sauce["usersDisliked"].indexOf(userId),
                 1
               );
-              sauce["usersLiked"].push(userId);
-            } else {
-              sauce["usersLiked"].push(userId);
             }
-          }
+            sauce["usersLiked"].push(userId);
+            sauce.likes++;
+            }
           break;
 
         // if it's nolike/nodislike
@@ -149,6 +148,7 @@ exports.likeSauce = (req, res, next) => {
           if (sauce["usersLiked"].includes(userId)) {
             // remove the user from the like array
             sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId), 1);
+            sauce.likes--;
             // if the user already dislike
           } else if (sauce["usersDisliked"].includes(userId)) {
             // remove the user from the dislike array
@@ -156,6 +156,7 @@ exports.likeSauce = (req, res, next) => {
               sauce["usersDisliked"].indexOf(userId),
               1
             );
+            sauce.dislikes--;
           }
           break;
 
@@ -170,11 +171,10 @@ exports.likeSauce = (req, res, next) => {
                 sauce["usersLiked"].indexOf(userId),
                 1
               );
-              sauce["usersDisliked"].push(userId);
-            } else {
-              sauce["usersDisliked"].push(userId);
             }
-          }
+            sauce["usersDisliked"].push(userId);
+            sauce.dislikes--;
+            }
           break;
 
         default:
