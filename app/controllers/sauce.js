@@ -1,12 +1,17 @@
 // Import our sauce model
 const Sauce = require("../models/sauce");
-// Import the filesystem module
+
+// The fs module of Node.js provides useful functions for interacting with the filesystem.
 const fs = require("fs");
+
+// The Path module provides a way of working with directories and file paths.
+const path = require("path");
 
 //=================================>
 /////////////////// Create sauce
 //=================================>
 exports.createSauce = (req, res, next) => {
+
   // Check if request contain files uploaded
   if (!req.body || !req.file) {
     return res.status(401).json({
@@ -19,11 +24,10 @@ exports.createSauce = (req, res, next) => {
   // supprime l'ID envoyé par le front
   delete sauceObject._id;
   const sauce = new Sauce({
-    // l"opérateur spread ... permet de copier les champs qu'il y a dans la body de la requête
+    // l'opérateur spread ... permets de copier les champs qu'il y a dans le corp de la req.
     ...sauceObject,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
-    }`,
+    //je donne à mon image le nom qui est dans le corp de la req.
+    imageUrl: `/images/${req.file.filename}`,
   });
   // on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
@@ -39,11 +43,11 @@ exports.updateSauce = (req, res, next) => {
   const sauceObject = req.file
     ? {
         ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        imageUrl: `/images/${
           req.file.filename
         }`,
       }
-    : { ...req.body };
+    : { ...req.body};
   Sauce.updateOne(
     { _id: req.params.id },
     { ...sauceObject, _id: req.params.id }
@@ -66,8 +70,10 @@ exports.updateSauce = (req, res, next) => {
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      const filename = sauce.imageUrl.split("/images/")[1];
-      fs.unlink(`images/${filename}`, () => {
+      // je récupère le chemin ou est stocké mon image pour pouvoir la supprimer
+      const imageUrl = path.join(__dirname, "../..", sauce.imageUrl);
+      //fs.unlink permets de supprimé l'image
+      fs.unlink(imageUrl, () => {
         Sauce.deleteOne({ _id: req.params.id })
           .then(() => res.status(200).json({ message: "Sauce deleted !" }))
           .catch((error) => res.status(400).json({ error }));
@@ -80,8 +86,14 @@ exports.deleteSauce = (req, res, next) => {
 /////////////////// Get one sauce
 //=================================>
 exports.readOneSauce = (req, res, next) => {
+
   Sauce.findOne({ _id: req.params.id })
-    .then((sauce) => res.status(200).json(sauce))
+    .then((sauce) => {
+      // console.log(sauce);
+      //le nom de la propriété est = au lien de l'url + le chemin relatif de l'image
+      sauce.imageUrl = `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
+      res.status(200).json(sauce);
+    })
     .catch((error) => res.status(404).json({ message: "Sauce not found" }));
 };
 
@@ -96,6 +108,13 @@ exports.readAllSauces = (req, res, next) => {
           error: "No sauces to display",
         });
       } else {
+        //j'itère sur chaque sauce afin de lui ajouter l'URI de mon API et l'adresse de l'image
+        //sauce c'est mon x
+        sauces = sauces.map((sauce) => {
+          sauce.imageUrl = `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
+          //retourne moi sauce avec son lien complet
+          return sauce
+        })
         res.status(200).json(sauces);
       }
     })

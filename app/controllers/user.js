@@ -1,11 +1,10 @@
 //on a besoin du package de cryptage de MDP qui est bcrypt
-//note: il faut installer le package bcrypt avant
 const bcrypt = require("bcrypt");
 
 //on a besoin de notre model users
 const User = require("../models/user");
 
-//j'importe mon package pour la vérification et la création de token
+//J'importe mon package pour la vérification et la création de token
 const jwt = require("jsonwebtoken");
 
 //=================================>
