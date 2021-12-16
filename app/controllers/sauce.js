@@ -40,28 +40,25 @@ exports.createSauce = (req, res, next) => {
 /////////////////// Update sauce
 //=================================>
 exports.updateSauce = (req, res, next) => {
-  const sauceObject = req.file
-    ? {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `/images/${
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    const filename = sauce.imageUrl.split("/images/")[1];
+    fs.unlink(`images/${filename}`, () => {
+      const sauceObject = req.file
+        ? {
+            ...JSON.parse(req.body.sauce),
+            imageUrl:  `/images/${
           req.file.filename
         }`,
-      }
-    : { ...req.body};
-  Sauce.updateOne(
-    { _id: req.params.id },
-    { ...sauceObject, _id: req.params.id }
-  )
-    .then(() => {
-      res.status(200).json({
-        message: "Sauce updated !!",
-      });
-    })
-    .catch((error) => {
-      res.status(403).json({
-        error: "Request not allowed !",
-      });
+          }
+        : { ...req.body };
+      Sauce.updateOne(
+        { _id: req.params.id },
+        { ...sauceObject, _id: req.params.id }
+      )
+        .then(() => res.status(200).json({ message: "Sauce updated !!" }))
+        .catch((error) => res.status(400).json({ error, error: "Request not allowed !" }));
     });
+  });
 };
 
 //=================================>
