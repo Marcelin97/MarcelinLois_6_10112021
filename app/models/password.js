@@ -1,4 +1,4 @@
-var passwordValidator = require("password-validator");
+const passwordValidator = require("password-validator");
 
 //=================================>
 ///////////////// Template password

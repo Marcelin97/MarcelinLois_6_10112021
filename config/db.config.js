@@ -1,4 +1,7 @@
+// load .env variables
 require("dotenv").config();
+
+
 const bunyan = require("bunyan");
 
 var log = bunyan.createLogger({
@@ -20,7 +23,7 @@ var log = bunyan.createLogger({
 });
 
 function mongoLogger(msg, state) {
-  //console.log(msg, state);
+  console.log(msg, state);
 
   switch (state.type) {
     case "debug":

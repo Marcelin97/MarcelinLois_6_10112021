@@ -40,6 +40,7 @@ exports.createSauce = (req, res, next) => {
 /////////////////// Update sauce
 //=================================>
 exports.updateSauce = (req, res, next) => {
+  //je récupère l'image existante de ma sauce
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     const filename = sauce.imageUrl.split("/images/")[1];
     fs.unlink(`images/${filename}`, () => {
@@ -128,8 +129,7 @@ exports.likeSauce = (req, res, next) => {
 
 function changeLike(sauce, state, userId) {
   sauce["usersDisliked"].splice(sauce["usersDisliked"].indexOf(userId), 1);
-}
-
+  };
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
