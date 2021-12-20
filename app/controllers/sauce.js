@@ -11,7 +11,6 @@ const path = require("path");
 /////////////////// Create sauce
 //=================================>
 exports.createSauce = (req, res, next) => {
-
   // Check if request contain files uploaded
   if (!req.body || !req.file) {
     return res.status(401).json({
@@ -47,9 +46,7 @@ exports.updateSauce = (req, res, next) => {
       const sauceObject = req.file
         ? {
             ...JSON.parse(req.body.sauce),
-            imageUrl:  `/images/${
-          req.file.filename
-        }`,
+            imageUrl: `/images/${req.file.filename}`,
           }
         : { ...req.body };
       Sauce.updateOne(
@@ -57,7 +54,9 @@ exports.updateSauce = (req, res, next) => {
         { ...sauceObject, _id: req.params.id }
       )
         .then(() => res.status(200).json({ message: "Sauce updated !!" }))
-        .catch((error) => res.status(400).json({ error, error: "Request not allowed !" }));
+        .catch((error) =>
+          res.status(400).json({ error, error: "Request not allowed !" })
+        );
     });
   });
 };
@@ -84,7 +83,6 @@ exports.deleteSauce = (req, res, next) => {
 /////////////////// Get one sauce
 //=================================>
 exports.readOneSauce = (req, res, next) => {
-
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       // console.log(sauce);
@@ -109,10 +107,11 @@ exports.readAllSauces = (req, res, next) => {
         //j'itère sur chaque sauce afin de lui ajouter l'URI de mon API et l'adresse de l'image
         //sauce c'est mon x
         sauces = sauces.map((sauce) => {
-          sauce.imageUrl = `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
+          sauce.imageUrl =
+            `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
           //retourne moi sauce avec son lien complet
-          return sauce
-        })
+          return sauce;
+        });
         res.status(200).json(sauces);
       }
     })
@@ -124,88 +123,67 @@ exports.readAllSauces = (req, res, next) => {
 //=================================>
 exports.likeSauce = (req, res, next) => {
   // Params
-  let userId = req.body.userId;
-  let like = req.body.like;
+  const { userId, like } = req.body;
+
+  function changeLike(sauce, userId, state) {
+    // If the user already like the sauce
+    if (sauce["usersLiked"].includes(userId)) {
+      // Remove the user from the like array
+      sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId), 1);
+      sauce.likes--;
+    }
+
+    // If the user already dislike
+    if (sauce["usersDisliked"].includes(userId)) {
+      // Remove the user from the dislike array
+      sauce["usersDisliked"].splice(sauce["usersDisliked"].indexOf(userId), 1);
+      sauce.dislikes--;
+    }
+
+    // The user want to like
+    if (state == 1) {
+      sauce["usersLiked"].push(userId);
+      sauce.likes++;
+    }
+    // The user want to dislike
+    else if (state == -1) {
+      sauce["usersDisliked"].push(userId);
+      sauce.dislikes++;
+    }
+  }
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
-
-      //on vérifie que la sauce existe bien
+      // on vérifie que la sauce existe bien
       if (!Sauce) {
-        return res.status(404).json({
-          error: new Error("This sauce does not exist !"),
-        });
+        return res
+          .status(404)
+          .json({ error: new Error("This sauce does not exist !") });
       }
 
       switch (like) {
         // If it is a like
         case 1:
-          // if this user doesn't already like the sauce,
-          if (!sauce["usersLiked"].includes(userId)) {
-            // and this user already dislike the sauce
-            if (sauce["usersDisliked"].includes(userId)) {
-              sauce["usersDisliked"].splice(
-                sauce["usersDisliked"].indexOf(userId),
-                1
-              );
-            }
-            sauce["usersLiked"].push(userId);
-            sauce.likes++;
-            }
+          changeLike(sauce, userId, 1);
           break;
 
         // if it's nolike/nodislike
         case 0:
-          // If the user already like the sauce
-          if (sauce["usersLiked"].includes(userId)) {
-            // remove the user from the like array
-            sauce["usersLiked"].splice(sauce["usersLiked"].indexOf(userId), 1);
-            sauce.likes--;
-            // if the user already dislike
-          } else if (sauce["usersDisliked"].includes(userId)) {
-            // remove the user from the dislike array
-            sauce["usersDisliked"].splice(
-              sauce["usersDisliked"].indexOf(userId),
-              1
-            );
-            sauce.dislikes--;
-          }
+          changeLike(sauce, userId, 0);
           break;
 
         // if it's a dislike
         case -1:
-          // if the user doesn't already dislike the sauce
-          if (!sauce["usersDisliked"].includes(userId)) {
-            // and the user already like the sauce
-            if (sauce["usersLiked"].includes(userId)) {
-              // remove the user from the like array and push the user in the dislike array
-              sauce["usersLiked"].splice(
-                sauce["usersLiked"].indexOf(userId),
-                1
-              );
-            }
-            sauce["usersDisliked"].push(userId);
-            sauce.dislikes--;
-            }
+          changeLike(sauce, userId, -1);
           break;
 
         default:
           break;
       }
-      // Set the number of likes and dislikes for this sauce to the length of each according array
-      sauce["dislikes"] = sauce["usersDisliked"].length;
-      sauce["likes"] = sauce["usersLiked"].length;
 
-      Sauce.updateOne(
-        {
-          _id: req.params.id,
-        },
-        sauce
-      )
+      Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => {
-          res.status(200).json({
-            message: "The sauce has been updated",
-          });
+          res.status(200).json({ message: "The sauce has been updated" });
         })
         .catch((err) => {
           res.status(500).json({ error });
