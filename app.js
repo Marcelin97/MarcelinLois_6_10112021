@@ -1,24 +1,29 @@
 //on a besoin d'express. On importe express dans une constante
 const express = require("express");
 
-//on importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
+// on importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
 const bodyParser = require("body-parser");
 
-//Envoi le contenu du fichier .env dans l'object process.env
+// Envoi le contenu du fichier .env dans l'object process.env
 require("dotenv").config();
 
-//j'importe ma BDD qui est dans le fichier db.config.js
+// j'importe ma BDD qui est dans le fichier db.config.js
 require("./config/db.config");
 
-//accéder au path de notre serveur
+// accéder au path de notre serveur
 const path = require("path");
 
-//j'importe mes routes qui sont mtn dans mon index.js
+//j'importe mon logger
+require('./logger/index')
+
+// j'importe mes routes qui sont mtn dans mon index.js
 const router = require("./app/routes/index");
 
 //on crée une constante app qui est notre application. 
 //On appel la méthode express ce qui permet de crée une application express
 const app = express();
+
+
 
 //=================================>
 /////////////////// middleware CORS
@@ -38,7 +43,7 @@ module.exports = app;
 //on utilise une méthode .json qui va transformer notre requête en objet JSON.
 app.use(bodyParser.json());
 
-//on récupère nos routes qui est l'index.js, appelé router.
+//on applique nos routes à notre app.
 app.use("/api", router);
 
 // Serve static files
@@ -69,16 +74,17 @@ const session = require("express-session");
 
 //paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
 app.set('trust proxy', 1) // trust first proxy
-app.use(session({
+app.use(
+  session({
     secret: "keyboard cat",
     resave: false,
     saveUninitialized: false,
     cookie: {
       //Les attaques cross-site scripting ou XSS
-      secure: true,
-      httponly: true,
+      secure: true, // only send cookie over https
+      httponly: true, // minimize risk of XSS attacks by restricting the client from reading the cookie
       domain: "http://localhost:3000",
-      // expires: expiryDate,
+      maxAge: 60000 * 60 * 24, // set cookie expiry length in ms
     },
   })
 );
@@ -91,6 +97,7 @@ app.use(session({
 //=================================>
 //module that helps secure your applications by setting various HTTP headers.
 const helmet = require("helmet");
+const logger = require("./logger/logger");
 app.use(helmet());
 //=================================>
 //Set some secure headers with helmet.js

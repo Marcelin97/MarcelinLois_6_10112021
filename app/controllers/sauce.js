@@ -127,10 +127,6 @@ exports.likeSauce = (req, res, next) => {
   let userId = req.body.userId;
   let like = req.body.like;
 
-function changeLike(sauce, state, userId) {
-  sauce["usersDisliked"].splice(sauce["usersDisliked"].indexOf(userId), 1);
-  };
-
   Sauce.findById(req.params.id)
     .then((sauce) => {
 

@@ -1,49 +1,6 @@
 // load .env variables
 require("dotenv").config();
 
-
-const bunyan = require("bunyan");
-
-var log = bunyan.createLogger({
-  name: "MongoDB Driver",
-  streams: [
-    {
-      stream: process.stdout,
-      level: "info",
-    },
-    {
-      stream: process.stdout,
-      level: "debug",
-    },
-    {
-      stream: process.stderr,
-      level: "error",
-    },
-  ],
-});
-
-function mongoLogger(msg, state) {
-  console.log(msg, state);
-
-  switch (state.type) {
-    case "debug":
-      log.debug(state);
-      break;
-    case "info":
-      log.info(state);
-      break;
-    case "warn":
-      log.warn(state);
-    case "error":
-    default:
-      log.error(state);
-  }
-}
-
-var options = {
-  logger: mongoLogger,
-  loggerLevel: "info",
-};
 //=================================>
 /////////////////// Connect MongoDB
 //=================================>
@@ -53,9 +10,8 @@ const mongoose = require("mongoose");
 if (!process.env.MONGO_URI) {
   console.log("No DB_URI found in .env configuration");
 }
-
 mongoose
-  .connect(process.env.MONGO_URI, options, {
+  .connect(process.env.MONGO_URI,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
