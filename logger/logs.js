@@ -7,6 +7,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level}] ${message}`;
 });
 
+// Create a Winston logger
 const logs = () => {
     return createLogger({
       level: "info",

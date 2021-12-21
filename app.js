@@ -97,7 +97,6 @@ app.use(
 //=================================>
 //module that helps secure your applications by setting various HTTP headers.
 const helmet = require("helmet");
-const logger = require("./logger/logger");
 app.use(helmet());
 //=================================>
 //Set some secure headers with helmet.js

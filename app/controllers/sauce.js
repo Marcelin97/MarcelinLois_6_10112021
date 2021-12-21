@@ -11,10 +11,20 @@ const path = require("path");
 /////////////////// Create sauce
 //=================================>
 exports.createSauce = (req, res, next) => {
+
   // Check if request contain files uploaded
-  if (!req.body || !req.file) {
+  if (!req.file) {
+    //revoir le code erreur
     return res.status(401).json({
       message: "Your request does not contain an image.",
+    });
+  }
+
+  // Check if request contain text
+  if (!req.body) {
+    //revoir le code erreur
+    return res.status(401).json({
+      message: "Your request does not contain text.",
     });
   }
 
@@ -23,9 +33,9 @@ exports.createSauce = (req, res, next) => {
   // supprime l'ID envoyé par le front
   delete sauceObject._id;
   const sauce = new Sauce({
-    // l'opérateur spread ... permets de copier les champs qu'il y a dans le corp de la req.
+    // l'opérateur spread ... permets de copier les champs qu'il y a dans la requête.
     ...sauceObject,
-    //je donne à mon image le nom qui est dans le corp de la req.
+    //je donne à mon image le nom qui est dans le corp de la requête.
     imageUrl: `/images/${req.file.filename}`,
   });
   // on utilise la méthode .save pour sauvegarder dans la BDD
@@ -42,22 +52,24 @@ exports.updateSauce = (req, res, next) => {
   //je récupère l'image existante de ma sauce
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     const filename = sauce.imageUrl.split("/images/")[1];
-    fs.unlink(`images/${filename}`, () => {
-      const sauceObject = req.file
-        ? {
-            ...JSON.parse(req.body.sauce),
-            imageUrl: `/images/${req.file.filename}`,
-          }
-        : { ...req.body };
-      Sauce.updateOne(
-        { _id: req.params.id },
-        { ...sauceObject, _id: req.params.id }
-      )
-        .then(() => res.status(200).json({ message: "Sauce updated !!" }))
-        .catch((error) =>
-          res.status(400).json({ error, error: "Request not allowed !" })
-        );
-    });
+    const sauceObject = req.file
+      ? {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `/images/${req.file.filename}`,
+      }
+      : { ...req.body };
+    
+    if (sauceObject.imageUrl) {
+          fs.unlink(`images/${filename}`);
+    }
+    Sauce.updateOne(
+      { _id: req.params.id },
+      { ...sauceObject, _id: req.params.id }
+    )
+      .then(() => res.status(200).json({ message: "Sauce updated !!" }))
+      .catch((error) =>
+        res.status(400).json({ error: "Request not allowed !" })
+      );
   });
 };
 
