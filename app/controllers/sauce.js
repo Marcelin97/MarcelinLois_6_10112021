@@ -52,16 +52,23 @@ exports.updateSauce = (req, res, next) => {
   //je récupère l'image existante de ma sauce
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     const filename = sauce.imageUrl.split("/images/")[1];
+    console.log(filename);
     const sauceObject = req.file
       ? {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `/images/${req.file.filename}`,
-      }
+          ...JSON.parse(req.body.sauce),
+          imageUrl: `/images/${req.file.filename}`,
+        }
       : { ...req.body };
-    
-    if (sauceObject.imageUrl) {
-          fs.unlink(`images/${filename}`);
+
+    // Delete the old image
+    try {
+      if (sauceObject.imageUrl) {
+        fs.unlinkSync(`images/${filename}`);
+      }
+    } catch(error){
+       console.log(error)
     }
+
     Sauce.updateOne(
       { _id: req.params.id },
       { ...sauceObject, _id: req.params.id }

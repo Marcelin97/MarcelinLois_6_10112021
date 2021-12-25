@@ -23,8 +23,6 @@ const router = require("./app/routes/index");
 //On appel la méthode express ce qui permet de crée une application express
 const app = express();
 
-
-
 //=================================>
 /////////////////// middleware CORS
 //=================================>
