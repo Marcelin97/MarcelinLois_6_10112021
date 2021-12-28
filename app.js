@@ -13,8 +13,11 @@ require("./config/db.config");
 // accéder au path de notre serveur
 const path = require("path");
 
-//j'importe mon logger
-require('./logger/index')
+// logger
+require('./logger/logger')
+
+// Protecting against the NoSQL injection
+const mongoSanitize = require("express-mongo-sanitize");
 
 // j'importe mes routes qui sont mtn dans mon index.js
 const router = require("./app/routes/index");
@@ -41,17 +44,15 @@ module.exports = app;
 //on utilise une méthode .json qui va transformer notre requête en objet JSON.
 app.use(bodyParser.json());
 
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize()); 
+
 //on applique nos routes à notre app.
 app.use("/api", router);
 
 // Serve static files
 app.use("/images/", express.static(path.join(__dirname, "images")));
 
-// //error handling middleware
-// app.use(function (err, req, res, next) {
-//   // console.log(err);
-//   res.status(422).send({ error: error.message })
-// });
 
 //=================================>
 ////////////////// Start application

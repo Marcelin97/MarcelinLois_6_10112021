@@ -7,23 +7,6 @@ const User = require("../models/user");
 //J'importe mon package pour la vérification et la création de token
 const jwt = require("jsonwebtoken");
 
-//=================================>
-/// Validation errors from mongoose
-//=================================>
-const errorFormater = e => {
-  let errors = {}
-  const allErrors = e.substring(e.indexOf(":") + 1).trim()
-  const allErrorsInArrayFormat = allErrors.split(",").map(err => err.trim())
-  allErrorsInArrayFormat.forEach((error) => {
-    const [key, value] = error.split(":").map((error) => error.trim());
-    errors[key] = value;
-  });
-  return errors
-}
-//=================================>
-/// Validation errors from mongoose
-//=================================>
-
 //le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
 
 //////////////////////////////////////////////////////////////////////////////

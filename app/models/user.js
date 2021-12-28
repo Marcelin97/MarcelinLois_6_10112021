@@ -10,31 +10,37 @@ const validator = require("validator");
 ///////////////// Template for auth.
 //=================================>
 const userSchema = mongoose.Schema({
-    //on rajoute une configuration qui sera unique: true qui évite de s'enregistrer avec le même e-mail
-    email: {
-        type: String,
-        require: true,
-        unique: [true, "Email is required"],
-        // validate(value){
-        //     if (!validator.isEmail(value)) {
-        //         throw new Error('E-mail invalide')
-        //     }
-        // }
+  //on rajoute une configuration qui sera unique: true qui évite de s'enregistrer avec le même e-mail
+  email: {
+    type: String,
+    require: true,
+    unique: [true, "Email is required"],
+    lowercase: true,
+    trim: true,
+    maxlength: 50,
+    // validate: {
+    //   validator: (v) => validator.isEmail(v),
+    //   message: (props) => `${props.value} is not a valid email`,
+    // },
+    validate: (value) => {
+      return validator.isEmail(value);
     },
-    password: {
-        type: String,
-        require: [true, "Password is required"],
-        minLength: [8, "Password can't be shorter than 8 characters"],
-        minLowercase: 1,
-        minUppercase: 1,
-        minNumbers: 1,
-        minSymbols: 1,
-        validate(value){
-            if (!validator.isStrongPassword(value)){
-                throw new Error('Le mot de passe est trop faible !')
-            }
-        }
-    }
+  },
+  password: {
+    type: String,
+    require: [true, "Password is required"],
+    minLength: [8, "Password can't be shorter than 8 characters"],
+    trim: true,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+    validate(value) {
+      if (!validator.isStrongPassword(value)) {
+        throw new Error("Le mot de passe est trop faible !");
+      }
+    },
+  },
 });
 //=================================>
 ///////////////// Template for auth.
