@@ -14,12 +14,15 @@ module.exports.registerValidation = (req, res, next) => {
             .trim()
             .required(),
     });
-
-    const { error } = schema.validate({ ...req.body });
-     if (error) {
-       res.status(400).send(error.details[0].message);
-     } else {
-       next();
+    try {
+        const { error } = schema.validate({ ...req.body });
+        if (error) {
+            res.status(400).send(error.details[0].message);
+        } else {
+            next();
+        }
     }
-
+    catch (err) {
+        console.log(err);
+    }
 }

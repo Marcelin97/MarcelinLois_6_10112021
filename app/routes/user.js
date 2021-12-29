@@ -4,7 +4,6 @@ const router = express.Router();
 //on a besoin de notre contrôler pour associé les fonctions au différentes routes
 const userCtrl = require("../controllers/user");
 
-
 //on ajoute notre middleware pour la vérification du MDP
 const verifyPassword = require("../middleware/verifyPassword")
 

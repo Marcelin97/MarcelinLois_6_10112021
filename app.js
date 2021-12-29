@@ -30,7 +30,12 @@ const app = express();
 /////////////////// middleware CORS
 //=================================>
 const cors = require("cors");
-app.use(cors());
+app.use(
+  cors({
+    // CORS n’accepte qu’un seul client, qui est l’application Frontend
+    origin: process.env.CLIENT_ENDPOINT,
+  })
+);
 //=================================>
 /////////////////// middleware CORS
 //=================================>
@@ -92,11 +97,13 @@ app.use(
 //=================================>
 
 //=================================>
+// x - xss - protection
 //Set some secure headers with helmet.js
 //=================================>
 //module that helps secure your applications by setting various HTTP headers.
 const helmet = require("helmet");
 app.use(helmet());
 //=================================>
+// x - xss - protection
 //Set some secure headers with helmet.js
 //=================================>
