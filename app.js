@@ -1,33 +1,33 @@
-//on a besoin d'express. On importe express dans une constante
+// On a besoin d'express. On importe express dans une constante
 const express = require("express");
 
-// on importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
+// On importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
 const bodyParser = require("body-parser");
 
 // Envoi le contenu du fichier .env dans l'object process.env
 require("dotenv").config();
 
-// j'importe ma BDD qui est dans le fichier db.config.js
+// j'importe ma BDD
 require("./config/db.config");
 
-// accéder au path de notre serveur
+// Accéder au path de notre serveur
 const path = require("path");
 
-// logger
+// Logger
 require('./logger/logger')
 
 // Protecting against the NoSQL injection
 const mongoSanitize = require("express-mongo-sanitize");
 
-// j'importe mes routes qui sont mtn dans mon index.js
+// J'importe mes routes qui sont mtn dans mon index.js
 const router = require("./app/routes/index");
 
-//on crée une constante app qui est notre application. 
-//On appel la méthode express ce qui permet de crée une application express
+// On crée une constante app qui est notre application. 
+// On appel la méthode express ce qui permet de crée une application express
 const app = express();
 
 //=================================>
-/////////////////// middleware CORS
+/////////////////// Middleware CORS
 //=================================>
 const cors = require("cors");
 app.use(
@@ -37,22 +37,30 @@ app.use(
   })
 );
 //=================================>
-/////////////////// middleware CORS
+//////////////// End Middleware CORS
 //=================================>
 
-//exportons notre variable d'application afin qu'elle puisse être importée et utilisée dans d'autres fichiers.
-//Notamment depuis notre serveur node.
+// Exportons notre variable d'application afin qu'elle puisse être importée et utilisée dans d'autres fichiers.
+// Notamment depuis notre serveur node.
 module.exports = app;
 
-//Nous devrons être capables d'extraire l'objet JSON de la demande. Il nous faudra le package body-parser
-//avant les routes de l'application, on utilise app.use comme middleware global
-//on utilise une méthode .json qui va transformer notre requête en objet JSON.
-app.use(bodyParser.json());
+//=================================>
+///////////////// Limit payload size
+//=================================>
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+app.use(bodyParser.json())
+
+//=================================>
+///////////// End Limit payload size
+//=================================>
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize()); 
 
-//on applique nos routes à notre app.
+// On applique nos routes à notre app.
 app.use("/api", router);
 
 // Serve static files
@@ -68,7 +76,7 @@ app.listen(PORT, () => {
   console.log("server is listening on port" + " " + PORT + " " + "...");
 });
 //=================================>
-////////////////// Start application
+////////////// End Start application
 //=================================>
 
 //=================================>
@@ -76,15 +84,15 @@ app.listen(PORT, () => {
 //=================================>
 const session = require("express-session");
 
-//paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
+// paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
 app.set('trust proxy', 1) // trust first proxy
 app.use(
   session({
-    secret: "keyboard cat",
+    secret: "keyboard cat", // secret string used in the signing of the session ID that is stored in the cookie
     resave: false,
     saveUninitialized: false,
     cookie: {
-      //Les attaques cross-site scripting ou XSS
+      // Les attaques cross-site scripting ou XSS
       secure: true, // only send cookie over https
       httponly: true, // minimize risk of XSS attacks by restricting the client from reading the cookie
       domain: "http://localhost:3000",
@@ -93,17 +101,17 @@ app.use(
   })
 );
 //=================================>
-///////// Express Session Middleware
+///// End Express Session Middleware
 //=================================>
 
 //=================================>
 // x - xss - protection
-//Set some secure headers with helmet.js
+// Set some secure headers with helmet.js
 //=================================>
-//module that helps secure your applications by setting various HTTP headers.
+// module that helps secure your applications by setting various HTTP headers.
 const helmet = require("helmet");
 app.use(helmet());
 //=================================>
-// x - xss - protection
-//Set some secure headers with helmet.js
+// End - x - xss - protection
+// Set some secure headers with helmet.js
 //=================================>
