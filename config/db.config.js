@@ -1,27 +1,69 @@
-// load .env variables
+const mongoose = require("mongoose");
+const bunyan = require("bunyan");
+const log = bunyan.createLogger({
+  name: "MongoDB Driver",
+  serializers: {
+    dbQuery: serializer,
+  },
+  streams: [
+    {
+      stream: process.stdout,
+      level: "info",
+    },
+    {
+      stream: process.stdout,
+      level: "debug",
+    },
+    {
+      stream: process.stderr,
+      level: "error",
+    },
+    {
+      type: "rotating-file",
+      path: "./logs/mongodb.log",
+      period: "1d", // daily rotation
+      count: 3, // keep 3 back copies
+    },
+  ],
+});
 require("dotenv").config();
 
-//path to my logger 
-const logger = require('../logger/logger'); 
-
-//=================================>
-/////////////////// Connect MongoDB
-//=================================>
-const mongoose = require("mongoose");
-
-//If the URI is nof found in .env config
 if (!process.env.MONGO_URI) {
-  console.log("No DB_URI found in .env configuration");
+  console.log("No DB_URL found in .env configuration");
 }
+
+function serializer(data) {
+  let query = JSON.stringify(data.query);
+  let options = JSON.stringify(data.options || {});
+
+  return `db.${data.coll}.${data.method}(${query}, ${options});`;
+}
+
+mongoose.set("debug", function (coll, method, query, doc, options) {
+  let set = {
+    coll: coll,
+    method: method,
+    query: query,
+    doc: doc,
+    options: options,
+  };
+
+  log.info({
+    dbQuery: set,
+  });
+});
+
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    ssl:true,
   })
-  .then(() => logger.debug("Connexion à MongoDB réussie !"))
-  .catch(() => logger.error("Connexion à MongoDB échouée !"));
+  .then(() => {
+    console.log("Connected to database");
+  })
+  .catch((error) => {
+    console.log("Database connection error: " + error);
+  });
 
-module.exports = mongoose;
-//=================================>
-/////////////////// Connect MongoDB
-//=================================>
+module.exports = mongoose.connection;

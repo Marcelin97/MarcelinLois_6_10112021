@@ -13,9 +13,6 @@ require("./config/db.config");
 // Accéder au path de notre serveur
 const path = require("path");
 
-// Logger
-require('./logger/logger')
-
 // Protecting against the NoSQL injection
 const mongoSanitize = require("express-mongo-sanitize");
 
