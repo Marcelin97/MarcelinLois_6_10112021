@@ -6,11 +6,6 @@ const uniqueValidator = require('mongoose-unique-validator');
 //validate the user input
 const validator = require("validator");
 
-const encrypt = require("mongoose-encryption");
-
-var encKey = process.env.SOME_32BYTE_BASE64_STRING;
-var sigKey = process.env.SOME_64BYTE_BASE64_STRING;
-
 //=================================>
 ///////////////// Template for auth.
 //=================================>
@@ -23,13 +18,9 @@ const userSchema = mongoose.Schema({
     lowercase: true,
     trim: true,
     maxlength: 50,
-    // validate: {
-    //   validator: (v) => validator.isEmail(v),
-    //   message: (props) => `${props.value} is not a valid email`,
+    // validate: (value) => {
+    //   return validator.isEmail(value);
     // },
-    validate: (value) => {
-      return validator.isEmail(value);
-    },
   },
   password: {
     type: String,
@@ -53,12 +44,6 @@ const userSchema = mongoose.Schema({
 
 //on pass notre validator mongoose en plugin sur notre schema utilisateur
 userSchema.plugin(uniqueValidator);
-
-userSchema.plugin(encrypt, {
-  encryptionKey: encKey,
-  signingKey: sigKey,
-  encryptedFields: ["email"],
-});
 
 //on exporte le schema sous forme de model, on utilise .model de mongoose
 module.exports = mongoose.model('User', userSchema);

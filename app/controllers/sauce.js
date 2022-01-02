@@ -16,7 +16,7 @@ exports.createSauce = (req, res, next) => {
   // Check if request contain files uploaded
   if (!req.file) {
     //revoir le code erreur
-    return res.status(401).json({
+    return res.status(422).json({
       message: "Your request does not contain an image.",
     });
   }
@@ -24,7 +24,7 @@ exports.createSauce = (req, res, next) => {
   // Check if request contain text
   if (!req.body) {
     //revoir le code erreur
-    return res.status(401).json({
+    return res.status(422).json({
       message: "Your request does not contain text.",
     });
   }
@@ -43,7 +43,7 @@ exports.createSauce = (req, res, next) => {
   sauce
     .save()
     .then(() => res.status(201).json({ message: "Sauce saved !" }))
-    .catch((error) => res.status(400).json({ error }));
+    .catch((error) => res.status(500).json({ error }));
 };
 
 //=================================>
@@ -76,7 +76,7 @@ exports.updateSauce = (req, res, next) => {
     )
       .then(() => res.status(200).json({ message: "Sauce updated !!" }))
       .catch((error) =>
-        res.status(400).json({ error: "Request not allowed !" })
+        res.status(500).json({ error: "Request not allowed !" })
       );
   });
 };
@@ -93,10 +93,10 @@ exports.deleteSauce = (req, res, next) => {
       fs.unlink(imageUrl, () => {
         Sauce.deleteOne({ _id: req.params.id })
           .then(() => res.status(200).json({ message: "Sauce deleted !" }))
-          .catch((error) => res.status(400).json({ error }));
+          .catch((error) => res.status(500).json({ error }));
       });
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(404).json({ error }));
 };
 
 //=================================>
@@ -135,7 +135,7 @@ exports.readAllSauces = (req, res, next) => {
         res.status(200).json(sauces);
       }
     })
-    .catch((error) => res.status(400).json({ error }));
+    .catch((error) => res.status(500).json({ error }));
 };
 
 //================================>
@@ -209,5 +209,5 @@ exports.likeSauce = (req, res, next) => {
           res.status(500).json({ error });
         });
     })
-    .catch((error) => res.status(404).json({ error }));
+    .catch((error) => res.status(500).json({ error }));
 };

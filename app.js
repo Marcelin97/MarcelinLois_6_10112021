@@ -64,17 +64,17 @@ app.use("/api", router);
 app.use("/images/", express.static(path.join(__dirname, "images")));
 
 
-//=================================>
-////////////////// Start application
-//=================================>
-const PORT = process.env.PORT || 3000;
+// //=================================>
+// ////////////////// Start application
+// //=================================>
+// const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log("server is listening on port" + " " + PORT + " " + "...");
-});
-//=================================>
-////////////// End Start application
-//=================================>
+// app.listen(PORT, () => {
+//   console.log("server is listening on port" + " " + PORT + " " + "...");
+// });
+// //=================================>
+// ////////////// End Start application
+// //=================================>
 
 //=================================>
 ///////// Express Session Middleware

@@ -7,13 +7,43 @@ const User = require("../models/user");
 //J'importe mon package pour la vérification et la création de token
 const jwt = require("jsonwebtoken");
 
-//le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
+require("dotenv").config();
 
-//////////////////////////////////////////////////////////////////////////////
-////////la fonction pour l'enregistrement de nouveaux utilisateurs////////////
-//////////////////////////////////////////////////////////////////////////////
+var CryptoJS = require("crypto-js");
+
+// //le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
+
+// //////////////////////////////////////////////////////////////////////////////
+// ////////la fonction pour l'enregistrement de nouveaux utilisateurs////////////
+// //////////////////////////////////////////////////////////////////////////////
+
+// encrypte email
+function encrypted(email) {
+  return CryptoJS.AES.encrypt(
+    email,
+    CryptoJS.enc.Base64.parse(process.env.PASSPHRASE),
+    {
+      iv: CryptoJS.enc.Base64.parse(process.env.IV),
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    }
+  ).toString();
+}
+
+// check if the string is an email.
+function validateEmail(email) {
+  const res =
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return res.test(String(email).toLowerCase());
+}
 
 exports.signup = (req, res, next) => {
+  
+  // Check email validation
+  if (!validateEmail(req.body.email)) {
+    return res.status(400).json({ error: "L'email indiqué est invalide." });
+  }
+
   //la première choses on Hash le mot de pass (c'est une fonction asynchrone qui prends du temps) pour le crypter
   //on appel la fonction bcrypt.hash pour crypter un MDP(on lui passe le MDP du corp de la requête, le salt c'est combien de fois on execute l'algo de hashage)
   bcrypt
@@ -21,12 +51,14 @@ exports.signup = (req, res, next) => {
     //comme c'est une méthode asynchrone on a then et un catch
     //on récupère le hash du MDP
     .then((hash) => {
+      // Encrypt email
+      var emailEncrypted = encrypted(req.body.email);
       //on créer notre nouveau user avec notre modèle mongoose
       const user = new User({
         //on récupère l'e-mail du corp de la requête
-        email: req.body.email,
+        email: emailEncrypted,
         //on récupère le hash du MDP
-        password: hash
+        password: hash,
       });
       //on utilise la méthode .save pour sauvegarder dans la BDD
       user
@@ -34,13 +66,7 @@ exports.signup = (req, res, next) => {
         //on renvoi un 201 pour une création de ressource et on renvoi un message en objet
         .then(() => res.status(201).json({ message: "User created!" }))
         //on capte une erreur en 400
-        .catch((error) =>
-          res.status(400).json({
-            message: "Something went wrong.",
-            case: "VALIDATION ERROR",
-            debugInfo: errorFormater(error.message),
-          })
-        );
+        .catch((error) => res.status(422).json({ error }));
     })
     //on capte l'erreur que l'on renvoi dans un objet
     .catch((error) => res.status(500).json({ error }));
@@ -54,15 +80,17 @@ exports.signup = (req, res, next) => {
 //////////////////////////////////////////////////////////////////////////////
 
 exports.login = (req, res, next) => {
+  // Encrypt email
+  var emailEncrypted = encrypted(req.body.email);
+
   //on va commencer par trouvé le user dans la BDD qui correspond à l'email renseigner par la personne
-  User.findOne({ email: req.body.email })
+  User.findOne({ email: emailEncrypted })
     .then((user) => {
       //si on a pas trouvé de user
       if (!user) {
-        //on renvoi un 401 avec notre propre message
-        return res.status(401).json({ error: "User not found!" });
-        }
-        //si on arrive ici c'est qu'on a trouvé un utilisateur
+        return res.status(404).json({ error: "User not found!" });
+      }
+      //si on arrive ici c'est qu'on a trouvé un utilisateur
       //on utilise bcrypt pour comparer le MDP envoyé par l'utilisateur qui essai de se connecter avec le user qu'on a reçu de la BDD
       bcrypt
         //on utilise la méthode .compare
@@ -71,7 +99,7 @@ exports.login = (req, res, next) => {
           //on créer un boolean
           //si la comparaison n'est pas bonne - si le MDP n'est pas le meme
           if (!valid) {
-            return res.status(401).json({ error: "Incorrect password !" });
+            return res.status(403).json({ error: "Incorrect password !" });
           }
           //si le MDP est le bon l'utilisateur reçoit
           //son user id et son token d'identification
@@ -85,7 +113,7 @@ exports.login = (req, res, next) => {
             }),
           });
         })
-        // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user, 
+        // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user,
         //on peut mettre une erreur serveur
         .catch((error) => res.status(500).json({ error }));
     })

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bunyan = require("bunyan");
+require("dotenv").config();
+
 const log = bunyan.createLogger({
   name: "MongoDB Driver",
   serializers: {
@@ -26,7 +28,6 @@ const log = bunyan.createLogger({
     },
   ],
 });
-require("dotenv").config();
 
 if (!process.env.MONGO_URI) {
   console.log("No DB_URL found in .env configuration");
