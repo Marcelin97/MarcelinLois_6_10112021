@@ -1,6 +1,7 @@
 // Import our sauce model
 const Sauce = require("../models/sauce");
 
+<<<<<<< HEAD
 // The fs module of Node.js provides useful functions for interacting with the filesystem.
 const fs = require("fs");
 
@@ -13,6 +14,24 @@ const path = require("path");
 //=================================>
 exports.createSauce = (req, res, next) => {
 
+=======
+<<<<<<< Updated upstream
+//POST
+exports.createSauce = (req, res, next) => {
+  //supprime l'ID envoyé par le front
+  delete req.body._id;
+=======
+// The fs module of Node.js provides useful functions for interacting with the filesystem.
+const fs = require("fs");
+
+// The Path module provides a way of working with directories and file paths.
+const path = require("path");
+
+//=================================>
+/////////////////// Create sauce
+//=================================>
+exports.createSauce = (req, res, next) => {
+>>>>>>> main
   // Check if request contain files uploaded
   if (!req.file) {
     //revoir le code erreur
@@ -33,6 +52,10 @@ exports.createSauce = (req, res, next) => {
 
   // supprime l'ID envoyé par le front
   delete sauceObject._id;
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> main
   const sauce = new Sauce({
     // l'opérateur spread ... permets de copier les champs qu'il y a dans la requête.
     ...sauceObject,
@@ -46,6 +69,24 @@ exports.createSauce = (req, res, next) => {
     .catch((error) => res.status(500).json({ error }));
 };
 
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+//PUT
+exports.modifySauce = (req, res, next) => {
+  Sauce.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id})
+    .then(() => {
+      res.status(200).json({
+        message: "Sauce mise à jour avec succès !!",
+      });
+    })
+    .catch((error) => {
+      res.status(400).json({
+        error: error,
+      });
+    });
+=======
+>>>>>>> main
 //=================================>
 /////////////////// Update sauce
 //=================================>
@@ -66,8 +107,13 @@ exports.updateSauce = (req, res, next) => {
       if (sauceObject.imageUrl) {
         fs.unlinkSync(`images/${filename}`);
       }
+<<<<<<< HEAD
     } catch(error){
        console.log(error)
+=======
+    } catch (error) {
+      console.log(error);
+>>>>>>> main
     }
 
     Sauce.updateOne(
@@ -79,6 +125,10 @@ exports.updateSauce = (req, res, next) => {
         res.status(500).json({ error: "Request not allowed !" })
       );
   });
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> main
 };
 
 //=================================>
