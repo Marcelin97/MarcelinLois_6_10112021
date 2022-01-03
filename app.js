@@ -85,7 +85,7 @@ const session = require("express-session");
 app.set('trust proxy', 1) // trust first proxy
 app.use(
   session({
-    secret: "keyboard cat", // secret string used in the signing of the session ID that is stored in the cookie
+    secret: process.env.SESSION_SECRETE, // secret string used in the signing of the session ID that is stored in the cookie
     resave: false,
     saveUninitialized: false,
     cookie: {
