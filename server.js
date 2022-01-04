@@ -1,3 +1,4 @@
+//Chargement du module HTTP
 const http = require('http');
 
 //on importe notre application, pour importé le app.js qui est dans le même dossier.
@@ -55,16 +56,5 @@ server.on("listening", () => {
   console.log("Listening on " + bind);
 });
 
+//Le serveur va attendre et lire les requêtes qui arriveront sur le port 3000.
 server.listen(port);
-
-
-
-// const cors = require("cors");
-
-// var corsOptions = {
-//   origin: "http://localhost:3000",
-// };
-
-// app.use(cors(corsOptions));
-
-

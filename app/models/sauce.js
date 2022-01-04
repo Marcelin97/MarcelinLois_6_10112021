@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
-//on créer notre schéma pour l'authentification
+//=================================>
+///////////////// Template for sauce
+//=================================>
 const sauceSchema = mongoose.Schema({
   userId: { type: String, required: true, ref: "User" },
   name: { type: String, required: true },
@@ -14,6 +16,9 @@ const sauceSchema = mongoose.Schema({
   usersLiked: [{ type: String, ref: "User" }],
   usersDisliked: [{ type: String, ref: "User" }],
 });
+//=================================>
+///////////////// Template for sauce
+//=================================>
 
 // on exporte le schema sous forme de model, on utilise .model de mongoose
 module.exports = mongoose.model("Sauce", sauceSchema);

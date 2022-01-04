@@ -1,7 +1,6 @@
 //on a besoin de notre package pour vérifier les tokens
 const jwt = require("jsonwebtoken");
 
-//on exporte un middleware
 //on utilise des blocs try catch, car il y a plusieurs éléments qui peuvent posé problème
 module.exports = (req, res, next) => {
   try {
@@ -13,7 +12,7 @@ module.exports = (req, res, next) => {
     //la seconde étape et de décoder le token
     //on va utiliser le package jsonwebtoken et la fonction verify
     //(on vérifie le token et on veut vérifier la clé secrete)
-    const decodedToken = jwt.verify(token, "RANDOM_TOKEN_SECRET");
+    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
     //quand on décode le token cela devient un objet JS
     // donc on va pouvoir récupérer le userId qui est dedans
     const userId = decodedToken.userId;
@@ -31,6 +30,6 @@ module.exports = (req, res, next) => {
   } catch (error) {
     //on renvoi une erreur 401 pour une erreur d'authentification
     //et dans le json si on reçoit une erreur on veut l'envoyé sinon cela envoi un message
-    res.status(401).json({ error: error | "Requête non authentifiée" });
+    res.status(401).json({ error: error || "Requête non authentifiée" });
   }
 };

@@ -1,16 +1,12 @@
-//on a besoin d'express. On importe express dans une constante
+// On a besoin d'express. On importe express dans une constante
 const express = require("express");
 
-//on importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
+// On importe bodyParser pour transformer le corp de la requête en JSON, en objet JS utilisable
 const bodyParser = require("body-parser");
 
-//j'importe ma BDD qui est dans le fichier db.config.js
-const mongoose = require("./config/db.config");
+// Envoi le contenu du fichier .env dans l'object process.env
+require("dotenv").config();
 
-<<<<<<< Updated upstream
-//on crée une constante app qui est notre application. 
-//On appel la méthode express ce qui permet de crée une application express
-=======
 // j'importe ma BDD
 require("./config/db.config");
 
@@ -23,77 +19,50 @@ const mongoSanitize = require("express-mongo-sanitize");
 // J'importe mes routes qui sont mtn dans mon index.js
 const router = require("./app/routes/index");
 
-// On crée une constante app qui est notre application.
+// On crée une constante app qui est notre application. 
 // On appel la méthode express ce qui permet de crée une application express
-// deepcode ignore UseCsurfForExpress: <please specify a reason of ignoring this>, deepcode ignore UseCsurfForExpress: <please specify a reason of ignoring this>
->>>>>>> Stashed changes
 const app = express();
 
-//on importe nos routes
-// const stuffRoutes = require("./routes/stuff");
-const userRoutes = require("./app/routes/user");
-const sauceRoutes = require("./app/routes/sauce");
-
 //=================================>
-/////////////////// middleware CORS
+/////////////////// Middleware CORS
 //=================================>
-<<<<<<< Updated upstream
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
-  next();
-});
-=======
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-// parse application/json
-app.use(bodyParser.json());
-
->>>>>>> Stashed changes
+const cors = require("cors");
+app.use(
+  cors({
+    // CORS n’accepte qu’un seul client, qui est l’application Frontend
+    origin: process.env.CLIENT_ENDPOINT,
+  })
+);
 //=================================>
-/////////////////// middleware CORS
+//////////////// End Middleware CORS
 //=================================>
 
-<<<<<<< Updated upstream
-//On importe toute la logique de nos routes. 
-app.use("/api/sauces", sauceRoutes);
-app.use("/api/auth", userRoutes );
-
-//On exporte notre application pour y avoir accès depuis n'importe qu'elle fichier. 
-//Notamment depuis notre serveur node.
+// Exportons notre variable d'application afin qu'elle puisse être importée et utilisée dans d'autres fichiers.
+// Notamment depuis notre serveur node.
 module.exports = app;
 
-//Nous devrons être capables d'extraire l'objet JSON de la demande. Il nous faudra le package body-parser
-//avant les routes de l'application, on utilise app.use comme middleware global
-//on utilise une méthode .json qui va transformer notre requête en objet JSON.
-app.use(bodyParser.json());
+//=================================>
+///////////////// Limit payload size
+//=================================>
 
-// //paramètre les cookies en HTTP-only pour qu'ils ne puissents pas être modfié par un tiers
-// app.use(session({
-//   secret: "s3cur3"
-//   cookie: {
-//     secure: true,
-//     httponly: true,
-//     domain: 'http://localhost:3000'
-//   }
-// }));
-=======
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+app.use(bodyParser.json())
+
+//=================================>
+///////////// End Limit payload size
+//=================================>
+
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
+app.use(mongoSanitize()); 
 
 // On applique nos routes à notre app.
 app.use("/api", router);
 
 // Serve static files
 app.use("/images/", express.static(path.join(__dirname, "images")));
+
 
 // //=================================>
 // ////////////////// Start application
@@ -113,10 +82,10 @@ app.use("/images/", express.static(path.join(__dirname, "images")));
 const session = require("express-session");
 
 // paramètre les cookies en HTTP-only pour qu'ils ne puissent pas être modifié par un tiers
-app.set("trust proxy", 1); // trust first proxy
+app.set('trust proxy', 1) // trust first proxy
 app.use(
   session({
-    secret: process.env.SECRETE_SESSION, // secret string used in the signing of the session ID that is stored in the cookie
+    secret: "keyboard cat", // secret string used in the signing of the session ID that is stored in the cookie
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -143,4 +112,3 @@ app.use(helmet());
 // End - x - xss - protection
 // Set some secure headers with helmet.js
 //=================================>
->>>>>>> Stashed changes
