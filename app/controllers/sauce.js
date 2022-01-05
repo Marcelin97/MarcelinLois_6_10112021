@@ -42,7 +42,11 @@ exports.createSauce = (req, res, next) => {
   // on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
     .save()
-    .then(() => res.status(201).json({ message: "Sauce saved !" }))
+    .then(() =>
+      res
+        .status(201)
+        .json({ message: "Sauce saved !" }, hateoasLinks(req, sauce._id))
+    )
     .catch((error) => res.status(500).json({ error }));
 };
 
@@ -74,7 +78,11 @@ exports.updateSauce = (req, res, next) => {
       { _id: req.params.id },
       { ...sauceObject, _id: req.params.id }
     )
-      .then(() => res.status(200).json({ message: "Sauce updated !!" }))
+      .then(() =>
+        res
+          .status(200)
+          .json({ message: "Sauce updated !!" }, hateoasLinks(req, sauce._id))
+      )
       .catch((error) =>
         res.status(500).json({ error: "Request not allowed !" })
       );
@@ -92,7 +100,14 @@ exports.deleteSauce = (req, res, next) => {
       //fs.unlink permets de supprimé l'image
       fs.unlink(imageUrl, () => {
         Sauce.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: "Sauce deleted !" }))
+          .then(() =>
+            res
+              .status(200)
+              .json(
+                { message: "Sauce deleted !" },
+                hateoasLinks(req, sauce._id)
+              )
+          )
           .catch((error) => res.status(500).json({ error }));
       });
     })
@@ -108,9 +123,9 @@ exports.readOneSauce = (req, res, next) => {
       // console.log(sauce);
       //le nom de la propriété est = au lien de l'url + le chemin relatif de l'image
       sauce.imageUrl = `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
-      res.status(200).json(sauce);
+      res.status(200).json(sauce, hateoasLinks(req, sauce._id));
     })
-    .catch((error) => res.status(404).json({ message: "Sauce not found" }));
+    .catch((error) => res.status(404).json({ error: "Sauce not found" }));
 };
 
 //=================================>
@@ -130,7 +145,10 @@ exports.readAllSauces = (req, res, next) => {
           sauce.imageUrl =
             `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
           //retourne moi sauce avec son lien complet
-          return sauce;
+         const links = hateoasLinks(req, sauce._id);
+          const summury = {sauce, links };
+          // return sauce
+          return summury;
         });
         res.status(200).json(sauces);
       }
@@ -203,7 +221,12 @@ exports.likeSauce = (req, res, next) => {
 
       Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => {
-          res.status(200).json({ message: "The sauce has been updated" });
+          res
+            .status(200)
+            .json(
+              { message: "The sauce has been updated" },
+              hateoasLinks(req, sauce._id)
+            );
         })
         .catch((err) => {
           res.status(500).json({ error });
@@ -211,3 +234,48 @@ exports.likeSauce = (req, res, next) => {
     })
     .catch((error) => res.status(500).json({ error }));
 };
+
+// Return an array of all links HATEOAS
+function hateoasLinks(req, id) {
+  const baseUri = `${req.protocol}://${req.get("host")}`;
+
+  return [
+    {
+      rel: "createSauce",
+      method: "POST",
+      title: "Create Sauce",
+      href: baseUri + "/api/sauces",
+    },
+    {
+      rel: "updateSauce",
+      method: "PUT",
+      title: "Modify Sauce",
+      href: baseUri + "/api/sauces/" + id,
+    },
+    {
+      rel: "readOneSauce",
+      method: "GET",
+      title: "Read One Sauce",
+      href: baseUri + "/api/sauces/" + id,
+    },
+    {
+      rel: "readAllSauces",
+      method: "GET",
+      title: "Read All Sauces",
+      href: baseUri + "/api/sauces",
+    },
+
+    {
+      rel: "deleteSauce",
+      method: "DELETE",
+      title: "Delete Sauce",
+      href: baseUri + "/api/sauces/" + id,
+    },
+    {
+      rel: "likeSauce",
+      method: "POST",
+      title: "Like or Dislike Sauce",
+      href: baseUri + "/api/sauces/" + id + "/like",
+    },
+  ];
+}

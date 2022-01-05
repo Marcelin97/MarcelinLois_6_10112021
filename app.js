@@ -19,6 +19,8 @@ const mongoSanitize = require("express-mongo-sanitize");
 // J'importe mes routes qui sont mtn dans mon index.js
 const router = require("./app/routes/index");
 
+const hateoasLinker = require("express-hateoas-links");
+
 // On crée une constante app qui est notre application. 
 // On appel la méthode express ce qui permet de crée une application express
 const app = express();
@@ -54,6 +56,9 @@ app.use(bodyParser.json())
 ///////////// End Limit payload size
 //=================================>
 
+// replace standard express res.json with the new version
+app.use(hateoasLinker);
+
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize()); 
 
@@ -62,19 +67,6 @@ app.use("/api", router);
 
 // Serve static files
 app.use("/images/", express.static(path.join(__dirname, "images")));
-
-
-// //=================================>
-// ////////////////// Start application
-// //=================================>
-// const PORT = process.env.PORT || 3000;
-
-// app.listen(PORT, () => {
-//   console.log("server is listening on port" + " " + PORT + " " + "...");
-// });
-// //=================================>
-// ////////////// End Start application
-// //=================================>
 
 //=================================>
 ///////// Express Session Middleware

@@ -1,15 +1,18 @@
-//on a besoin du package de cryptage de MDP qui est bcrypt
+// package de cryptage du MDP
 const bcrypt = require("bcrypt");
 
 //on a besoin de notre model users
 const User = require("../models/user");
 
-//J'importe mon package pour la vérification et la création de token
+// package pour la vérification et la création de token
 const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 
-var CryptoJS = require("crypto-js");
+// package pour le cryptage de l'email
+const CryptoJS = require("crypto-js");
+
+const hateoasLinker = require("express-hateoas-links");
 
 // //le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
 
@@ -43,7 +46,6 @@ exports.signup = (req, res, next) => {
   if (!validateEmail(req.body.email)) {
     return res.status(400).json({ error: "L'email indiqué est invalide." });
   }
-
   //la première choses on Hash le mot de pass (c'est une fonction asynchrone qui prends du temps) pour le crypter
   //on appel la fonction bcrypt.hash pour crypter un MDP(on lui passe le MDP du corp de la requête, le salt c'est combien de fois on execute l'algo de hashage)
   bcrypt
@@ -64,7 +66,9 @@ exports.signup = (req, res, next) => {
       user
         .save()
         //on renvoi un 201 pour une création de ressource et on renvoi un message en objet
-        .then(() => res.status(201).json({ message: "User created!" }))
+        .then(() =>
+          res.status(201).json({ message: "User created!" }, hateoasLinks(req))
+        )
         //on capte une erreur en 400
         .catch((error) => res.status(422).json({ error }));
     })
@@ -111,7 +115,7 @@ exports.login = (req, res, next) => {
               //L'utilisateur devra donc se reconnecter au bout de 24 heures
               expiresIn: "24h",
             }),
-          });
+          }, hateoasLinks(req));
         })
         // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user,
         //on peut mettre une erreur serveur
@@ -124,3 +128,22 @@ exports.login = (req, res, next) => {
 //////////////////////////////////////////////////////////////////////////////
 ///////////la fonction pour connecter des utilisateurs existants//////////////
 //////////////////////////////////////////////////////////////////////////////
+
+function hateoasLinks(req) {
+  const baseUri = `${req.protocol}://${req.get("host")}`;
+
+  return [
+    {
+      rel: "signup",
+      method: "POST",
+      title: "Create User",
+      href: baseUri + "/api/auth/signup",
+    },
+    {
+      rel: "login",
+      method: "POST",
+      title: "Login User",
+      href: baseUri + "/api/auth/login",
+    },
+  ];
+}
