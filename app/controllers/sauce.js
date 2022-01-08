@@ -138,22 +138,17 @@ exports.readAllSauces = (req, res, next) => {
         return res.status(404).json({
           error: "No sauces to display",
         });
-      } else {
-        //j'itère sur chaque sauce afin de lui ajouter l'URI de mon API et l'adresse de l'image
-        //sauce c'est mon x
-        sauces = sauces.map((sauce) => {
-          sauce.imageUrl =
-            `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
-          //retourne moi sauce avec son lien complet
-         const links = hateoasLinks(req, sauce._id);
-          const summury = {sauce, links };
-          // return sauce
-          return summury;
-        });
-        res.status(200).json(sauces);
+      };
+      
+      for (var i = 0; i < sauces.length; i++) {
+        let sauce = sauces[i];
+
+        sauces[i].imageUrl = req.protocol + "://" + req.get("host") + sauces[i].imageUrl;
+        sauces[i] = { ...sauce._doc, links: [] };
+        sauces[i].links = hateoasLinks(req, sauce._id);
       }
-    })
-    .catch((error) => res.status(500).json({ error }));
+      res.status(200).json(sauces);
+    });
 };
 
 //================================>
