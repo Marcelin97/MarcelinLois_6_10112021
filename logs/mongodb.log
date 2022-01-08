@@ -72,3 +72,15 @@
 {"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":41196,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:17:45.542Z","v":0}
 {"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":50080,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:24:39.992Z","v":0}
 {"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":18936,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:25:17.070Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":41860,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:25:24.334Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":41324,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:27:47.189Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":47232,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:28:05.363Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":38456,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:28:07.995Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":51048,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:28:10.286Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":6568,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:28:29.708Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":47288,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:28:39.914Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":19840,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:28:54.812Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":46256,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-08T23:29:48.195Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":46256,"level":30,"dbQuery":"db.sauces.find({}, {});","msg":"","time":"2022-01-08T23:29:57.066Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":46256,"level":30,"dbQuery":"db.sauces.find({}, {});","msg":"","time":"2022-01-08T23:30:18.388Z","v":0}
+{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":46256,"level":30,"dbQuery":"db.sauces.find({}, {});","msg":"","time":"2022-01-08T23:34:27.339Z","v":0}
