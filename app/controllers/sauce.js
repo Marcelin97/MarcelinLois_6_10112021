@@ -150,7 +150,7 @@ exports.readAllSauces = (req, res, next) => {
           return sauceHateoas;
         });
         res.status(200).json(sauces);
-      }git 
+      } 
     })
     .catch((error) => res.status(500).json({ error }));
 };

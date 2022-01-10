@@ -12,8 +12,6 @@ require("dotenv").config();
 // package pour le cryptage de l'email
 const CryptoJS = require("crypto-js");
 
-const hateoasLinker = require("express-hateoas-links");
-
 // //le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
 
 // //////////////////////////////////////////////////////////////////////////////
