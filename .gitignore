@@ -2,5 +2,7 @@ node_modules
 .vscode
 .env
 images
-logs/
-/logs/
+logs/*
+/logs/*
+!logs/.gitkeep
+!/logs/.gitkeep
