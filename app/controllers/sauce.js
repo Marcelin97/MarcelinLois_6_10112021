@@ -45,7 +45,7 @@ exports.createSauce = (req, res, next) => {
     .then(() =>
       res
         .status(201)
-        .json({ message: "Sauce saved !" }, hateoasLinks(req, sauce._id))
+        .json(sauce, hateoasLinks(req, sauce._id))
     )
     .catch((error) => res.status(500).json({ error }));
 };
@@ -81,7 +81,7 @@ exports.updateSauce = (req, res, next) => {
       .then(() =>
         res
           .status(200)
-          .json({ message: "Sauce updated !!" }, hateoasLinks(req, sauce._id))
+          .json(sauce, hateoasLinks(req, sauce._id))
       )
       .catch((error) =>
         res.status(500).json({ error: "Request not allowed !" })
@@ -104,8 +104,7 @@ exports.deleteSauce = (req, res, next) => {
             res
               .status(200)
               .json(
-                { message: "Sauce deleted !" },
-                hateoasLinks(req, sauce._id)
+                { message: "Sauce deleted !" }
               )
           )
           .catch((error) => res.status(500).json({ error }));
@@ -223,7 +222,7 @@ exports.likeSauce = (req, res, next) => {
           res
             .status(200)
             .json(
-              { message: "The sauce has been updated" },
+              sauce,
               hateoasLinks(req, sauce._id)
             );
         })
@@ -240,38 +239,38 @@ function hateoasLinks(req, id) {
 
   return [
     {
-      rel: "createSauce",
+      rel: "create",
       method: "POST",
       title: "Create Sauce",
       href: baseUri + "/api/sauces",
     },
     {
-      rel: "updateSauce",
+      rel: "update",
       method: "PUT",
       title: "Modify Sauce",
       href: baseUri + "/api/sauces/" + id,
     },
     {
-      rel: "readOneSauce",
+      rel: "readOne",
       method: "GET",
       title: "Read One Sauce",
       href: baseUri + "/api/sauces/" + id,
     },
     {
-      rel: "readAllSauces",
+      rel: "readAll",
       method: "GET",
       title: "Read All Sauces",
       href: baseUri + "/api/sauces",
     },
 
     {
-      rel: "deleteSauce",
+      rel: "delete",
       method: "DELETE",
       title: "Delete Sauce",
       href: baseUri + "/api/sauces/" + id,
     },
     {
-      rel: "likeSauce",
+      rel: "likeDislike",
       method: "POST",
       title: "Like or Dislike Sauce",
       href: baseUri + "/api/sauces/" + id + "/like",
