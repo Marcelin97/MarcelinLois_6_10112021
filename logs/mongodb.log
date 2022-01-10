@@ -1,1 +1,0 @@
-{"name":"MongoDB Driver","hostname":"LAPTOP-33DQIMVA","pid":56236,"level":30,"dbQuery":"db.users.createIndex({\"email\":1}, {});","msg":"","time":"2022-01-09T16:27:02.899Z","v":0}
