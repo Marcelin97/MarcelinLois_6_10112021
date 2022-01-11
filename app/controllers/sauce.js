@@ -57,7 +57,7 @@ exports.updateSauce = (req, res, next) => {
   //je récupère l'image existante de ma sauce
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     const filename = sauce.imageUrl.split("/images/")[1];
-    console.log(filename);
+    // console.log(filename);
     const sauceObject = req.file
       ? {
           ...JSON.parse(req.body.sauce),
@@ -232,6 +232,48 @@ exports.likeSauce = (req, res, next) => {
     })
     .catch((error) => res.status(500).json({ error }));
 };
+
+exports.report = (req, res, next) => {
+  // Params
+  const { userId, report } = req.body;
+
+  function reportSauce(sauce, userId, state) {
+    // The user want to report
+    if (state == 1) {
+            sauce["usersAlert"].push(sauce["usersAlert"].indexOf(userId), 1);
+      sauce["usersAlert"].push(userId);
+      sauce.reports++;
+    }
+  }
+
+  Sauce.findById(req.params.id)
+    .then((sauce) => {
+      // on vérifie que la sauce existe bien
+      if (!Sauce) {
+        return res
+          .status(404)
+          .json({ error: new Error("This sauce does not exist !") });
+      };     
+
+            switch (report) {
+              case 1:
+                reportSauce(sauce, userId, 1);
+                break;
+              
+              default:
+                break;
+      }
+      
+      Sauce.updateOne({ _id: req.params.id }, sauce)
+        .then(() => {
+          res.status(200).json(sauce, hateoasLinks(req, sauce._id));
+        })
+        .catch((err) => {
+          res.status(500).json({ error });
+        });
+    })
+    .catch((error) => res.status(500).json({ error }));
+}
 
 // Return an array of all links HATEOAS
 function hateoasLinks(req, id) {

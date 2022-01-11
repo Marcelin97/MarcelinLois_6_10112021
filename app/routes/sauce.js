@@ -40,5 +40,11 @@ router.delete("/:id",auth, sauceCtrl.deleteSauce);
 //=================================>
 router.post("/:id/like", auth, sauceCtrl.likeSauce);
 
+//=================================>
+/////////////////// report sauce
+//=================================>
+router.post("/:id/report", auth, sauceCtrl.report);
+
+
 //on exporte le router de ce fichier
 module.exports = router;
