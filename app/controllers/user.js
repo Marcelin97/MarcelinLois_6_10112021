@@ -12,13 +12,9 @@ require("dotenv").config();
 // package pour le cryptage de l'email
 const CryptoJS = require("crypto-js");
 
-// //le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
-
-// //////////////////////////////////////////////////////////////////////////////
-// ////////la fonction pour l'enregistrement de nouveaux utilisateurs////////////
-// //////////////////////////////////////////////////////////////////////////////
-
-// encrypte email
+//=================================>
+/////////////////// ENCRYPTED EMAIL
+//=================================>
 function encrypted(email) {
   return CryptoJS.AES.encrypt(
     email,
@@ -30,6 +26,28 @@ function encrypted(email) {
     }
   ).toString();
 }
+//=================================>
+/////////////////// ENCRYPTED EMAIL
+//=================================>
+
+//=================================>
+/////////////////// DECRYPT EMAIL
+//=================================>
+function decryptEmail(email) {
+  var bytes = CryptoJS.AES.decrypt(
+    email,
+    CryptoJS.enc.Base64.parse(process.env.PASSPHRASE),
+    {
+      iv: CryptoJS.enc.Base64.parse(process.env.IV),
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    }
+  );
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
+//=================================>
+/////////////////// DECRYPT EMAIL
+//=================================>
 
 // check if the string is an email.
 function validateEmail(email) {
@@ -37,6 +55,12 @@ function validateEmail(email) {
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return res.test(String(email).toLowerCase());
 }
+
+// //le contrôleur à besoin de 2 fonction ou aussi appelé middlewares
+
+// //////////////////////////////////////////////////////////////////////////////
+// ////////la fonction pour l'enregistrement de nouveaux utilisateurs////////////
+// //////////////////////////////////////////////////////////////////////////////
 
 exports.signup = (req, res, next) => {
   
@@ -127,6 +151,34 @@ exports.login = (req, res, next) => {
 ///////////la fonction pour connecter des utilisateurs existants//////////////
 //////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////
+/////////////la fonction pour lire les données d'un utilisateur///////////////
+//////////////////////////////////////////////////////////////////////////////
+exports.readDatas = (req, res, next) => {
+  // Encrypt email
+  var emailEncrypted = encrypted(req.body.email);
+  User.findOne({ email: emailEncrypted })
+    .then((user) => {
+      //si on a pas trouvé de user
+      if (!user) {
+        return res.status(404).json({ error: "User not found!" });
+      }
+      // Decrypt email
+      user.email = decryptEmail(emailEncrypted);
+
+      res.status(200).json(user, hateoasLinks(req));
+    })
+    .catch((error) => {
+      res.status(404).send({ error });
+    });
+};
+//////////////////////////////////////////////////////////////////////////////
+/////////////la fonction pour lire les données d'un utilisateur///////////////
+//////////////////////////////////////////////////////////////////////////////
+
+//=================================>
+/////////////////// HATEOAS LINKS
+//=================================>
 function hateoasLinks(req) {
   const baseUri = `${req.protocol}://${req.get("host")}`;
 
@@ -143,5 +195,14 @@ function hateoasLinks(req) {
       title: "Login User",
       href: baseUri + "/api/auth/login",
     },
+    {
+      rel: "read",
+      method: "GET",
+      title: "Read User Datas",
+      href: baseUri + "/api/auth/read-datas",
+    },
   ];
 }
+//=================================>
+/////////////////// HATEOAS LINKS
+//=================================>

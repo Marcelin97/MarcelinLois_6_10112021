@@ -7,12 +7,10 @@ const fs = require("fs");
 // The Path module provides a way of working with directories and file paths.
 const path = require("path");
 
-
 //=================================>
 /////////////////// Create sauce
 //=================================>
 exports.createSauce = (req, res, next) => {
-
   // Check if request contain files uploaded
   if (!req.file) {
     //revoir le code erreur
@@ -42,11 +40,7 @@ exports.createSauce = (req, res, next) => {
   // on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
     .save()
-    .then(() =>
-      res
-        .status(201)
-        .json(sauce, hateoasLinks(req, sauce._id))
-    )
+    .then(() => res.status(201).json(sauce, hateoasLinks(req, sauce._id)))
     .catch((error) => res.status(500).json({ error }));
 };
 
@@ -70,19 +64,15 @@ exports.updateSauce = (req, res, next) => {
       if (sauceObject.imageUrl) {
         fs.unlinkSync(`images/${filename}`);
       }
-    } catch(error){
-       console.log(error)
+    } catch (error) {
+      console.log(error);
     }
 
     Sauce.updateOne(
       { _id: req.params.id },
       { ...sauceObject, _id: req.params.id }
     )
-      .then(() =>
-        res
-          .status(200)
-          .json(sauce, hateoasLinks(req, sauce._id))
-      )
+      .then(() => res.status(200).json(sauce, hateoasLinks(req, sauce._id)))
       .catch((error) =>
         res.status(500).json({ error: "Request not allowed !" })
       );
@@ -100,13 +90,7 @@ exports.deleteSauce = (req, res, next) => {
       //fs.unlink permets de supprimé l'image
       fs.unlink(imageUrl, () => {
         Sauce.deleteOne({ _id: req.params.id })
-          .then(() =>
-            res
-              .status(200)
-              .json(
-                { message: "Sauce deleted !" }
-              )
-          )
+          .then(() => res.status(200).json({ message: "Sauce deleted !" }))
           .catch((error) => res.status(500).json({ error }));
       });
     })
@@ -145,11 +129,11 @@ exports.readAllSauces = (req, res, next) => {
             `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
           //retourne moi sauce avec son lien complet
           const links = hateoasLinks(req, sauce._id);
-          const sauceHateoas = { ...sauce._doc, links};
+          const sauceHateoas = { ...sauce._doc, links };
           return sauceHateoas;
         });
         res.status(200).json(sauces);
-      } 
+      }
     })
     .catch((error) => res.status(500).json({ error }));
 };
@@ -219,12 +203,7 @@ exports.likeSauce = (req, res, next) => {
 
       Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => {
-          res
-            .status(200)
-            .json(
-              sauce,
-              hateoasLinks(req, sauce._id)
-            );
+          res.status(200).json(sauce, hateoasLinks(req, sauce._id));
         })
         .catch((err) => {
           res.status(500).json({ error });
@@ -240,8 +219,7 @@ exports.report = (req, res, next) => {
   function reportSauce(sauce, userId, state) {
     // The user want to report
     if (state == 1) {
-            sauce["usersAlert"].push(sauce["usersAlert"].indexOf(userId), 1);
-      sauce["usersAlert"].push(userId);
+      sauce["usersAlert"].push(sauce["usersAlert"].indexOf(userId), 1);
       sauce.reports++;
     }
   }
@@ -253,17 +231,17 @@ exports.report = (req, res, next) => {
         return res
           .status(404)
           .json({ error: new Error("This sauce does not exist !") });
-      };     
-
-            switch (report) {
-              case 1:
-                reportSauce(sauce, userId, 1);
-                break;
-              
-              default:
-                break;
       }
-      
+
+      switch (report) {
+        case 1:
+          reportSauce(sauce, userId, 1);
+          break;
+
+        default:
+          break;
+      }
+
       Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => {
           res.status(200).json(sauce, hateoasLinks(req, sauce._id));
@@ -273,7 +251,7 @@ exports.report = (req, res, next) => {
         });
     })
     .catch((error) => res.status(500).json({ error }));
-}
+};
 
 // Return an array of all links HATEOAS
 function hateoasLinks(req, id) {

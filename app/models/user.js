@@ -18,9 +18,6 @@ const userSchema = mongoose.Schema({
     lowercase: true,
     trim: true,
     maxlength: 50,
-    // validate: (value) => {
-    //   return validator.isEmail(value);
-    // },
   },
   password: {
     type: String,
@@ -37,6 +34,7 @@ const userSchema = mongoose.Schema({
       }
     },
   },
+  usersAlert: [{ type: String, ref: "User" }],
 });
 //=================================>
 ///////////////// Template for auth.

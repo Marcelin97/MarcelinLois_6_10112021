@@ -22,5 +22,12 @@ router.post("/signup", verifyPassword, registerValidation, userCtrl.signup);
 //=================================>
 router.post("/login", verifyPassword, registerValidation, userCtrl.login);
 
+router.get(
+  "/read-datas",
+  verifyPassword,
+  registerValidation,
+  userCtrl.readDatas
+);
+
 //on exporte le router de ce fichier
 module.exports = router;
