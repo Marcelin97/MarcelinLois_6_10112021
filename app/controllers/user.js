@@ -13,6 +13,10 @@ require("dotenv").config();
 const CryptoJS = require("crypto-js");
 const Sauce = require("../models/sauce");
 
+// Import the filesystem module 
+const fs = require('fs');
+const fsPromises = require('fs').promises;
+
 //=================================>
 /////////////////// ENCRYPTED EMAIL
 //=================================>
@@ -184,29 +188,20 @@ exports.readDatas = (req, res, next) => {
 exports.exportDatas = (req, res, next) => {
   // Encrypt email
   var emailEncrypted = encrypted(req.body.email);
+
   const userSauces = [];
+
   User.findOne({ email: emailEncrypted })
     .then(async (user) => {
-      //si on a pas trouvé de user
       if (!user) {
         return res.status(404).json({ error: "User not found!" });
       }
       // Decrypt email
       user.email = decryptEmail(emailEncrypted);
 
-      const filename = `${user._id}_${new Date().toJSON().slice(0, 10)}.txt`;
-      res.attachment(filename);
-      res.type("txt");
-
-      // Sauce.find({ userId: user._id }).then((sauces) => {
-      //   userInfo.sauces = [];
-
-      //   if (sauces.length <= 0) {
-      //     userInfo.sauces.push("You don't have any sauce in our DB");
-      //   } else {
-      //     userInfo.sauces.push(sauces);
-      //   }
-      // });
+      // const filename = `${user._id}_${new Date().toJSON().slice(0, 10)}.txt`;
+      // res.attachment(filename);
+      // res.type("txt");
 
       try {
         const sauces = await Sauce.find({ userId: user._id });
@@ -223,7 +218,16 @@ exports.exportDatas = (req, res, next) => {
       const result = { ...user._doc, sauces: userSauces };
 
       // write result to file
+      const jsonString = JSON.stringify(result, null, 2);
+      // console.log(jsonString); 
 
+      fs.writeFile(__dirname + "/test.txt", jsonString, (err) => {
+            if (err) {
+              console.log("Error writing file", err);
+            } else {
+              console.log("Successfully wrote file");
+            }
+      });
       return res.status(200).json(result);
     })
     .catch((error) => res.status(500).json({ error }));
