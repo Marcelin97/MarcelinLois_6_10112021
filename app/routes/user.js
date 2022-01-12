@@ -22,11 +22,24 @@ router.post("/signup", verifyPassword, registerValidation, userCtrl.signup);
 //=================================>
 router.post("/login", verifyPassword, registerValidation, userCtrl.login);
 
+//=================================>
+/////////////////// READ DATAS
+//=================================>
 router.get(
   "/read-datas",
   verifyPassword,
   registerValidation,
   userCtrl.readDatas
+);
+
+//=================================>
+/////////////////// EXPORT DATAS
+//=================================>
+router.get(
+  "/export-datas",
+  verifyPassword,
+  registerValidation,
+  userCtrl.exportDatas
 );
 
 //on exporte le router de ce fichier

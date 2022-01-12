@@ -11,6 +11,7 @@ require("dotenv").config();
 
 // package pour le cryptage de l'email
 const CryptoJS = require("crypto-js");
+const sauce = require("../models/sauce");
 
 //=================================>
 /////////////////// ENCRYPTED EMAIL
@@ -63,7 +64,6 @@ function validateEmail(email) {
 // //////////////////////////////////////////////////////////////////////////////
 
 exports.signup = (req, res, next) => {
-  
   // Check email validation
   if (!validateEmail(req.body.email)) {
     return res.status(400).json({ error: "L'email indiqué est invalide." });
@@ -129,15 +129,18 @@ exports.login = (req, res, next) => {
           }
           //si le MDP est le bon l'utilisateur reçoit
           //son user id et son token d'identification
-          res.status(200).json({
-            userId: user._id,
-            //nous utilisons une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour encoder notre token
-            //(à remplacer par une chaîne aléatoire beaucoup plus longue pour la production) ;
-            token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
-              //L'utilisateur devra donc se reconnecter au bout de 24 heures
-              expiresIn: "24h",
-            }),
-          }, hateoasLinks(req));
+          res.status(200).json(
+            {
+              userId: user._id,
+              //nous utilisons une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour encoder notre token
+              //(à remplacer par une chaîne aléatoire beaucoup plus longue pour la production) ;
+              token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
+                //L'utilisateur devra donc se reconnecter au bout de 24 heures
+                expiresIn: "24h",
+              }),
+            },
+            hateoasLinks(req)
+          );
         })
         // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user,
         //on peut mettre une erreur serveur
@@ -165,12 +168,51 @@ exports.readDatas = (req, res, next) => {
       }
       // Decrypt email
       user.email = decryptEmail(emailEncrypted);
-
-      res.status(200).json(user, hateoasLinks(req));
+      bcrypt.res.status(200).json(user, hateoasLinks(req));
     })
     .catch((error) => {
       res.status(404).send({ error });
     });
+};
+//////////////////////////////////////////////////////////////////////////////
+/////////////la fonction pour lire les données d'un utilisateur///////////////
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+///////////la fonction pour exporter les données d'un utilisateur/////////////
+//////////////////////////////////////////////////////////////////////////////
+exports.exportDatas = (req, res, next) => {
+  // Encrypt email
+  var emailEncrypted = encrypted(req.body.email);
+  const userSauces = [];
+  User.findOne({ email: emailEncrypted })
+    .then((user) => {
+      //si on a pas trouvé de user
+      if (!user) {
+        return res.status(404).json({ error: "User not found!" });
+      }
+      // Decrypt email
+      user.email = decryptEmail(emailEncrypted);
+      const filename = `${user._id}_${new Date().toJSON().slice(0, 10)}.txt`;
+      var userInfo = user.toString();
+     const merge = userInfo.concat(userSauces);
+
+      res.attachment(filename);
+      res.type("txt");
+      sauce.find({ userId: req.userId }).then((sauces) => {
+        // console.log(sauces);
+        // userSauces.push(userInfo);
+        if (sauces.length <= 0) {
+        return res.status(404).json({
+          error: "No sauces to display",
+        });
+        } else {
+          userSauces.push(sauces);
+        }
+      });
+      return res.status(200).send(merge);
+    })
+    .catch((error) => res.status(500).json({ error }));
 };
 //////////////////////////////////////////////////////////////////////////////
 /////////////la fonction pour lire les données d'un utilisateur///////////////
