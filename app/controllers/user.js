@@ -199,10 +199,6 @@ exports.exportDatas = (req, res, next) => {
       // Decrypt email
       user.email = decryptEmail(emailEncrypted);
 
-      // const filename = `${user._id}_${new Date().toJSON().slice(0, 10)}.txt`;
-      // res.attachment(filename);
-      // res.type("txt");
-
       try {
         const sauces = await Sauce.find({ userId: user._id });
 
@@ -218,15 +214,18 @@ exports.exportDatas = (req, res, next) => {
       const result = { ...user._doc, sauces: userSauces };
 
       // write result to file
-      const jsonString = JSON.stringify(result, null, 2);
-      // console.log(jsonString); 
 
-      fs.writeFile(__dirname + "/test.txt", jsonString, (err) => {
-            if (err) {
-              console.log("Error writing file", err);
-            } else {
-              console.log("Successfully wrote file");
-            }
+      // we must create a JSON string of the data with JSON.stringify
+      // we told stringify to enter the data with 2 spaces.
+      const resultJsonString = JSON.stringify(result, null, 2);
+      // console.log(jsonString);
+
+      fs.writeFile(__dirname + "/test.txt", resultJsonString, (err) => {
+        if (err) {
+          console.log("Error writing file", err);
+        } else {
+          console.log("Successfully wrote file");
+        }
       });
       return res.status(200).json(result);
     })
@@ -234,6 +233,33 @@ exports.exportDatas = (req, res, next) => {
 };
 //////////////////////////////////////////////////////////////////////////////
 /////////////la fonction pour lire les données d'un utilisateur///////////////
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+///////////////////la fonction pour supprimer son utilisateur/////////////////
+//////////////////////////////////////////////////////////////////////////////
+exports.delete = (req, res) => {
+  // Encrypt email
+  var emailEncrypted = encrypted(req.body.email);
+  User.findOneAndDelete({ email: emailEncrypted })
+    .then((result) => {
+      if (!result) {
+        return res
+          .status(401)
+          .json({ error: "Votre compte utilisateur n'as pas pu être trouvé." });
+      }
+
+      return res
+        .status(200)
+        .json(
+          { message: "Votre compte utilisateur a bien été supprimé." },
+          hateoasLinks(req)
+        );
+    })
+    .catch((error) => res.status(500).json({ error }));
+};
+//////////////////////////////////////////////////////////////////////////////
+///////////////////la fonction pour supprimer son utilisateur/////////////////
 //////////////////////////////////////////////////////////////////////////////
 
 //=================================>

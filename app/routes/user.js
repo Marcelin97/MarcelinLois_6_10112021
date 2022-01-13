@@ -42,5 +42,10 @@ router.get(
   userCtrl.exportDatas
 );
 
+//=================================>
+/////////////////// DELETE
+//=================================>
+router.delete("/delete", verifyPassword, registerValidation, userCtrl.delete);
+
 //on exporte le router de ce fichier
 module.exports = router;
