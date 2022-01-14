@@ -238,25 +238,66 @@ exports.exportDatas = (req, res, next) => {
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////la fonction pour supprimer son utilisateur/////////////////
 //////////////////////////////////////////////////////////////////////////////
+// exports.delete = (req, res) => {
+//   // // Encrypt email
+//   // var emailEncrypted = encrypted(req.body.email);
+//   // console.log(emailEncrypted);
+
+//   User.findByIdAndDelete(req.params.id)
+//     .then((user) => {
+//       if (!user) {
+//         return res.status(401).send({
+//           message: "Votre compte utilisateur n'as pas pu être trouvé.",
+//         });
+//       }
+//       res.send({ message: "User deleted successfully!" });
+
+
+//       return res
+//         .status(200)
+//         .json(
+//           { message: "Votre compte utilisateur a bien été supprimé." },
+//           hateoasLinks(req)
+//         );
+//     })
+//     .catch((error) => res.status(500).json({ error }));
+// };
+
+// exports.delete = (req, res) => {
+//     var emailEncrypted = encrypted(req.body.email);
+
+//   User.findByIdAndRemove({email: emailEncrypted})
+//     .then((user) => {
+//       if (!user) {
+//         return res.status(404).send({
+//           message: "User not found ",
+//         });
+//       }
+//       res.send({ message: "User deleted successfully!" });
+//     })
+//     .catch((err) => {
+//       return res.status(500).send({
+//         message: "Could not delete user ",
+//       });
+//     });
+// };
 exports.delete = (req, res) => {
   // Encrypt email
   var emailEncrypted = encrypted(req.body.email);
   User.findOneAndDelete({ email: emailEncrypted })
-    .then((result) => {
-      if (!result) {
-        return res
-          .status(401)
-          .json({ error: "Votre compte utilisateur n'as pas pu être trouvé." });
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({
+          message: "User not found with id " + emailEncrypted,
+        });
       }
-
-      return res
-        .status(200)
-        .json(
-          { message: "Votre compte utilisateur a bien été supprimé." },
-          hateoasLinks(req)
-        );
+      res.send({ message: "User deleted successfully!" });
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((err) => {
+      return res.status(500).send({
+        message: "Could not delete user",
+      });
+    });
 };
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////la fonction pour supprimer son utilisateur/////////////////
