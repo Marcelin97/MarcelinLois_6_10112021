@@ -346,7 +346,7 @@ exports.update = async (req, res) => {
   if (req.body.email && !req.body.password) {
     // Check email validation
     if (!validateEmail(req.body.email)) {
-      return res.status(400).json({ error: "L'email indiqué est invalide." });
+      return res.status(400).json({ error: "The specified email is invalid." });
     }
 
     // Encrypt email
@@ -362,10 +362,7 @@ exports.update = async (req, res) => {
     .then(() => {
       res
         .status(201)
-        .json(
-          { message: "Votre compte a bien été modifié." },
-          hateoasLinks(req)
-        );
+        .json({ message: "User updated successfully" }, hateoasLinks(req));
     })
     .catch((error) => res.status(400).json({ error }));
 };
@@ -393,6 +390,24 @@ function hateoasLinks(req) {
       method: "GET",
       title: "Read User Datas",
       href: baseUri + "/api/auth/read-datas",
+    },
+    {
+      rel: "export",
+      method: "GET",
+      title: "Export User Datas",
+      href: baseUri + "/api/auth/export-datas",
+    },
+    {
+      rel: "update",
+      method: "PUT",
+      title: "Update User",
+      href: baseUri + "/api/auth/update",
+    },
+    {
+      rel: "delete",
+      method: "DELETE",
+      title: "Delete User",
+      href: baseUri + "/api/auth/delete",
     },
   ];
 }
