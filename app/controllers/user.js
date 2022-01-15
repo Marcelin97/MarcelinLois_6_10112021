@@ -13,9 +13,9 @@ require("dotenv").config();
 const CryptoJS = require("crypto-js");
 const Sauce = require("../models/sauce");
 
-// Import the filesystem module 
-const fs = require('fs');
-const fsPromises = require('fs').promises;
+// Import the filesystem module
+const fs = require("fs");
+const fsPromises = require("fs").promises;
 
 //=================================>
 /////////////////// ENCRYPTED EMAIL
@@ -236,51 +236,8 @@ exports.exportDatas = (req, res, next) => {
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
-///////////////////la fonction pour supprimer son utilisateur/////////////////
+//////////////////////la fonction pour supprimer son compte///////////////////
 //////////////////////////////////////////////////////////////////////////////
-// exports.delete = (req, res) => {
-//   // // Encrypt email
-//   // var emailEncrypted = encrypted(req.body.email);
-//   // console.log(emailEncrypted);
-
-//   User.findByIdAndDelete(req.params.id)
-//     .then((user) => {
-//       if (!user) {
-//         return res.status(401).send({
-//           message: "Votre compte utilisateur n'as pas pu être trouvé.",
-//         });
-//       }
-//       res.send({ message: "User deleted successfully!" });
-
-
-//       return res
-//         .status(200)
-//         .json(
-//           { message: "Votre compte utilisateur a bien été supprimé." },
-//           hateoasLinks(req)
-//         );
-//     })
-//     .catch((error) => res.status(500).json({ error }));
-// };
-
-// exports.delete = (req, res) => {
-//     var emailEncrypted = encrypted(req.body.email);
-
-//   User.findByIdAndRemove({email: emailEncrypted})
-//     .then((user) => {
-//       if (!user) {
-//         return res.status(404).send({
-//           message: "User not found ",
-//         });
-//       }
-//       res.send({ message: "User deleted successfully!" });
-//     })
-//     .catch((err) => {
-//       return res.status(500).send({
-//         message: "Could not delete user ",
-//       });
-//     });
-// };
 exports.delete = (req, res) => {
   // Encrypt email
   var emailEncrypted = encrypted(req.body.email);
@@ -288,7 +245,7 @@ exports.delete = (req, res) => {
     .then((user) => {
       if (!user) {
         return res.status(404).send({
-          message: "User not found with id " + emailEncrypted,
+          message: "User not found",
         });
       }
       res.send({ message: "User deleted successfully!" });
@@ -300,9 +257,118 @@ exports.delete = (req, res) => {
     });
 };
 //////////////////////////////////////////////////////////////////////////////
-///////////////////la fonction pour supprimer son utilisateur/////////////////
+//////////////////////la fonction pour supprimer son compte///////////////////
 //////////////////////////////////////////////////////////////////////////////
+//Three case, if only email, if only password and if twice
+// exports.update = (req, res, next) => {
+//   // Encrypt email
+//   var emailEncrypted = encrypted(req.body.email);
 
+//   //si je modifie mon email et que je ne modifie pas mon MDP alors...
+//   if (req.body.email && !req.body.password) {
+//     const updatedEmail = {
+//       ...req.body.user,
+//       _id: req.params.id,
+//       email: emailEncrypted,
+//     };
+//     User.findByIdAndUpdate(
+//       { email: emailEncrypted },
+//       { ...updatedEmail },
+//       { new: true }
+//     )
+//       .then((update) => res.status(200).json({ message: "User updated" }))
+//       .catch((error) =>
+//         res.status(404).json({ error, message: "User not found" })
+//       );
+//     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
+//   } else if (!req.body.email && req.body.password) {
+//     bcrypt
+//       .hash(req.body.password, 10)
+//       .then((hash) => {
+//         const updatedPassword = {
+//           ...req.body.user,
+//           _id: req.params.id,
+//           password: hash,
+//         };
+//         User.findByIdAndUpdate(req.params.id, { ...updatedPassword })
+//           .then((updatedUser) =>
+//             res.status(200).json({ message: "User updated" })
+//           )
+//           .catch((error) =>
+//             res.status(404).json({ error, message: "User not found" })
+//           );
+//       })
+//       .catch((error) => res.status(500).json({ error }));
+//     // ...et je modifie mon MDP (les deux sont modifiés)
+//   } else {
+//     bcrypt
+//       .hash(req.body.password, 10)
+//       .then((hashedPAss) => {
+//         const updatedUser = {
+//           ...req.body.user,
+//           _id: req.params.id,
+//           email: req.body.email,
+//           password: hashedPAss,
+//         };
+//         User.findByIdAndUpdate(req.params.id, { ...updatedUser })
+//           .then((updatedUser) =>
+//             res.status(200).json({ message: "User updated" })
+//           )
+//           .catch((error) =>
+//             res.status(404).json({ error, message: "User not found" })
+//           );
+//       })
+//       .catch((error) => res.status(500).json({ error }));
+//   }
+// };
+exports.update = async (req, res) => {
+  // Find user in the current session
+  // Encrypt email
+  var emailEncrypted = encrypted(req.body.email);
+  let user = await User.findOne({ email: emailEncrypted });
+  // If user not found, return an error
+  if (!user) {
+    return res.status(404).json({ error: "User not found!" });
+  }
+
+  //If user change password
+  //     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
+  if (!req.body.email && req.body.password) {
+    // Encrypt the password send in request and save in the User object
+    const hash = await bcrypt.hash(req.body.password, 10);
+
+    // Save the password in the User object
+    user.password = hash;
+  }
+
+  // If user change email
+//si je modifie mon email et que je ne modifie pas mon MDP alors...
+  if (req.body.email && !req.body.password) {
+    // Check email validation
+    if (!validateEmail(req.body.email)) {
+      return res.status(400).json({ error: "L'email indiqué est invalide." });
+    }
+
+    // Encrypt email
+    var emailEncrypted = encryptEmail(req.body.email);
+
+    // Save the email in the User object
+    user.email = emailEncrypted;
+  }
+
+  // Save the user and return a response
+  user
+    .save()
+    .then(() => {
+      res
+        .status(201)
+        .json(
+          { message: "Votre compte a bien été modifié." },
+          hateoasLinks(req)
+        );
+    })
+    .catch((error) => res.status(400).json({ error }));
+};
 //=================================>
 /////////////////// HATEOAS LINKS
 //=================================>

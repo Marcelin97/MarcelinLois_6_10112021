@@ -47,5 +47,10 @@ router.get(
 //=================================>
 router.delete("/delete", verifyPassword, registerValidation, userCtrl.delete);
 
+//=================================>
+/////////////////// UPDATE
+//=================================>
+router.put("/update", verifyPassword, registerValidation, userCtrl.update);
+
 //on exporte le router de ce fichier
 module.exports = router;
