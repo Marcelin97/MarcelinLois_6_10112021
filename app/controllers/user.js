@@ -260,69 +260,15 @@ exports.delete = (req, res) => {
 //////////////////////la fonction pour supprimer son compte///////////////////
 //////////////////////////////////////////////////////////////////////////////
 //Three case, if only email, if only password and if twice
-// exports.update = async (req, res) => {
-// if (!req.body.email || !req.body.password) {
-//   res.status(400).send({
-//     message: "required fields cannot be empty",
-//   });
-// }
-//   // Find user in the current session
-//   // Encrypt email
-//   // var emailEncrypted = encrypted(req.body.email);
-//   let user = await User.findById(req.user._id).catch((e) =>
-//     res.status(500).json(e)
-//   );
-//   console.log(user);
-//   // If user not found, return an error
-//   if (!user) {
-//     return res.status(404).json({ error: "User not found!" });
-//   }
+exports.update = async function (req, res) {
+  const hash = await bcrypt.hash(req.body.password, 10);
 
-//   //If user change password
-//   //     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
-//   if (!req.body.email && req.body.password) {
-//     // Encrypt the password send in request and save in the User object
-//     const hash = await bcrypt.hash(req.body.password, 10);
-
-//     // Save the password
-//     user.password = hash;
-//   }
-
-//   // If user change email
-// //si je modifie mon email et que je ne modifie pas mon MDP alors...
-//   if (req.body.email && !req.body.password) {
-//     // Check email validation
-//     if (!validateEmail(req.body.email)) {
-//       return res.status(400).json({ error: "The specified email is invalid." });
-//     }
-
-//     // Encrypt email
-//     var emailEncrypted = encryptEmail(req.body.email);
-
-//     // Save the email in the User object
-//     user.email = emailEncrypted;
-//   }
-
-//   // Save the user and return a response
-//   user
-//     .save()
-//     .then(() => {
-//       res
-//         .status(201)
-//         .json({ message: "User updated successfully" }, hateoasLinks(req));
-//     })
-//     .catch((error) => res.status(400).json({ error }));
-// };
-
-exports.update = function (req, res) {
-  
   User.findOneAndUpdate(
     req.params._id,
-    
     {
       // id: req.body.id,
-      email: encrypted(req.body.email),
-      password: req.body.password,
+      email: req.body.email,
+      password: hash,
     },
     { new: true, useFindAndModify: false },
     function (err, result) {
