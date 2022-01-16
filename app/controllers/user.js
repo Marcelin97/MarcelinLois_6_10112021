@@ -172,7 +172,7 @@ exports.readDatas = (req, res, next) => {
       }
       // Decrypt email
       user.email = decryptEmail(emailEncrypted);
-      bcrypt.res.status(200).json(user, hateoasLinks(req));
+      res.status(200).json(user, hateoasLinks(req));
     })
     .catch((error) => {
       res.status(404).send({ error });
@@ -260,111 +260,84 @@ exports.delete = (req, res) => {
 //////////////////////la fonction pour supprimer son compte///////////////////
 //////////////////////////////////////////////////////////////////////////////
 //Three case, if only email, if only password and if twice
-// exports.update = (req, res, next) => {
+// exports.update = async (req, res) => {
+// if (!req.body.email || !req.body.password) {
+//   res.status(400).send({
+//     message: "required fields cannot be empty",
+//   });
+// }
+//   // Find user in the current session
 //   // Encrypt email
-//   var emailEncrypted = encrypted(req.body.email);
-
-//   //si je modifie mon email et que je ne modifie pas mon MDP alors...
-//   if (req.body.email && !req.body.password) {
-//     const updatedEmail = {
-//       ...req.body.user,
-//       _id: req.params.id,
-//       email: emailEncrypted,
-//     };
-//     User.findByIdAndUpdate(
-//       { email: emailEncrypted },
-//       { ...updatedEmail },
-//       { new: true }
-//     )
-//       .then((update) => res.status(200).json({ message: "User updated" }))
-//       .catch((error) =>
-//         res.status(404).json({ error, message: "User not found" })
-//       );
-//     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
-//   } else if (!req.body.email && req.body.password) {
-//     bcrypt
-//       .hash(req.body.password, 10)
-//       .then((hash) => {
-//         const updatedPassword = {
-//           ...req.body.user,
-//           _id: req.params.id,
-//           password: hash,
-//         };
-//         User.findByIdAndUpdate(req.params.id, { ...updatedPassword })
-//           .then((updatedUser) =>
-//             res.status(200).json({ message: "User updated" })
-//           )
-//           .catch((error) =>
-//             res.status(404).json({ error, message: "User not found" })
-//           );
-//       })
-//       .catch((error) => res.status(500).json({ error }));
-//     // ...et je modifie mon MDP (les deux sont modifiés)
-//   } else {
-//     bcrypt
-//       .hash(req.body.password, 10)
-//       .then((hashedPAss) => {
-//         const updatedUser = {
-//           ...req.body.user,
-//           _id: req.params.id,
-//           email: req.body.email,
-//           password: hashedPAss,
-//         };
-//         User.findByIdAndUpdate(req.params.id, { ...updatedUser })
-//           .then((updatedUser) =>
-//             res.status(200).json({ message: "User updated" })
-//           )
-//           .catch((error) =>
-//             res.status(404).json({ error, message: "User not found" })
-//           );
-//       })
-//       .catch((error) => res.status(500).json({ error }));
+//   // var emailEncrypted = encrypted(req.body.email);
+//   let user = await User.findById(req.user._id).catch((e) =>
+//     res.status(500).json(e)
+//   );
+//   console.log(user);
+//   // If user not found, return an error
+//   if (!user) {
+//     return res.status(404).json({ error: "User not found!" });
 //   }
+
+//   //If user change password
+//   //     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
+//   if (!req.body.email && req.body.password) {
+//     // Encrypt the password send in request and save in the User object
+//     const hash = await bcrypt.hash(req.body.password, 10);
+
+//     // Save the password
+//     user.password = hash;
+//   }
+
+//   // If user change email
+// //si je modifie mon email et que je ne modifie pas mon MDP alors...
+//   if (req.body.email && !req.body.password) {
+//     // Check email validation
+//     if (!validateEmail(req.body.email)) {
+//       return res.status(400).json({ error: "The specified email is invalid." });
+//     }
+
+//     // Encrypt email
+//     var emailEncrypted = encryptEmail(req.body.email);
+
+//     // Save the email in the User object
+//     user.email = emailEncrypted;
+//   }
+
+//   // Save the user and return a response
+//   user
+//     .save()
+//     .then(() => {
+//       res
+//         .status(201)
+//         .json({ message: "User updated successfully" }, hateoasLinks(req));
+//     })
+//     .catch((error) => res.status(400).json({ error }));
 // };
-exports.update = async (req, res) => {
-  // Find user in the current session
-  // Encrypt email
-  var emailEncrypted = encrypted(req.body.email);
-  let user = await User.findOne({ email: emailEncrypted });
-  // If user not found, return an error
-  if (!user) {
-    return res.status(404).json({ error: "User not found!" });
-  }
 
-  //If user change password
-  //     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
-  if (!req.body.email && req.body.password) {
-    // Encrypt the password send in request and save in the User object
-    const hash = await bcrypt.hash(req.body.password, 10);
-
-    // Save the password in the User object
-    user.password = hash;
-  }
-
-  // If user change email
-//si je modifie mon email et que je ne modifie pas mon MDP alors...
-  if (req.body.email && !req.body.password) {
-    // Check email validation
-    if (!validateEmail(req.body.email)) {
-      return res.status(400).json({ error: "The specified email is invalid." });
+exports.update = function (req, res) {
+  
+  User.findOneAndUpdate(
+    req.params._id,
+    
+    {
+      // id: req.body.id,
+      email: encrypted(req.body.email),
+      password: req.body.password,
+    },
+    { new: true, useFindAndModify: false },
+    function (err, result) {
+      if (err) {
+        console.log("err", err);
+        res.send("error updating user");
+      } else {
+        console.log(result);
+        res.status(200).send({
+          data: result,
+          msg: "data updated successfully",
+        });
+      }
     }
-
-    // Encrypt email
-    var emailEncrypted = encryptEmail(req.body.email);
-
-    // Save the email in the User object
-    user.email = emailEncrypted;
-  }
-
-  // Save the user and return a response
-  user
-    .save()
-    .then(() => {
-      res
-        .status(201)
-        .json({ message: "User updated successfully" }, hateoasLinks(req));
-    })
-    .catch((error) => res.status(400).json({ error }));
+  );
 };
 //=================================>
 /////////////////// HATEOAS LINKS
