@@ -50,7 +50,12 @@ router.delete("/delete", verifyPassword, registerValidation, userCtrl.delete);
 //=================================>
 /////////////////// UPDATE
 //=================================>
-router.put("/update", verifyPassword, userCtrl.update);
+router.put("/update", verifyPassword, registerValidation, userCtrl.update);
+
+//=================================>
+/////////////////// REPORT
+//=================================>
+router.post("/report", verifyPassword, registerValidation, userCtrl.report);
 
 //on exporte le router de ce fichier
 module.exports = router;

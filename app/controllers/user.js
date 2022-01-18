@@ -259,32 +259,133 @@ exports.delete = (req, res) => {
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////la fonction pour supprimer son compte///////////////////
 //////////////////////////////////////////////////////////////////////////////
-//Three case, if only email, if only password and if twice
-exports.update = async function (req, res) {
-  const hash = await bcrypt.hash(req.body.password, 10);
 
-  User.findOneAndUpdate(
-    req.params._id,
-    {
-      // id: req.body.id,
-      email: req.body.email,
-      password: hash,
-    },
-    { new: true, useFindAndModify: false },
-    function (err, result) {
-      if (err) {
-        console.log("err", err);
-        res.send("error updating user");
-      } else {
-        console.log(result);
-        res.status(200).send({
-          data: result,
-          msg: "data updated successfully",
-        });
-      }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////la fonction pour modifier son compte///////////////////
+//////////////////////////////////////////////////////////////////////////////
+//Three case, if only email, if only password and if twice
+// exports.update = async function (req, res) {
+//   const hash = await bcrypt.hash(req.body.password, 10);
+
+// User.findOneAndUpdate(
+//   req.params.id,
+//   {
+//     // _id: req.body.id,
+//     email: req.body.email,
+//     password: hash,
+//   },
+//   function (err, result) {
+//     if (err) {
+//       console.log("err", err);
+//       res.send("error updating user");
+//     } else {
+//       console.log(result);
+//       res.status(200).send({
+//         user: result,
+//         msg: "data updated successfully",
+//       });
+//     }
+//   }
+// );
+// };
+
+exports.update = async (req, res) => {
+  // Find user in the current session
+  // Encrypt email
+  var emailEncrypted = encrypted(req.body.email);
+  
+  let user = await User.findOne({ email: req.body.email });
+  // If user not found, return an error
+  if (!user) {
+    return res.status(404).json({ error: "User not found!" });
+  }
+
+  //If user change password
+  //     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
+  if (!req.body.email && req.body.password) {
+    // Encrypt the password send in request and save in the User object
+    const hash = await bcrypt.hash(req.body.password, 10);
+    // Save the password
+    user.password = hash;
+  }
+
+  // If user change email
+  //si je modifie mon email et que je ne modifie pas mon MDP alors...
+  if (req.body.email && !req.body.password) {
+    // Check email validation
+    if (!validateEmail(req.body.email)) {
+      return res.status(400).json({ error: "The specified email is invalid." });
     }
-  );
+
+    // Encrypt email
+    var emailEncrypted = encrypted(req.body.email);
+
+    // Save the email in the User object
+    user.email = emailEncrypted;
+  }
+
+  // Save the user and return a response
+  user
+    .updateOne()
+    .then(() => {
+      res
+        .status(201)
+        .json({ message: "User updated successfully" }, hateoasLinks(req));
+    })
+    .catch((error) => res.status(400).json({ error }));
 };
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////la fonction pour modifier son compte///////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+///////////////////////la fonction pour signaler un compte////////////////////
+//////////////////////////////////////////////////////////////////////////////
+exports.report = (req, res, next) => {
+  // Params
+  const { userId, report } = req.body;
+
+  function reportSauce(sauce, userId, state) {
+    // The user want to report
+    if (state == 1) {
+      sauce["usersAlert"].push(sauce["usersAlert"].indexOf(userId), 1);
+      sauce.reports++;
+    }o
+  }
+
+  Sauce.findById(req.params.id)
+    .then((sauce) => {
+      // on vérifie que la sauce existe bien
+      if (!Sauce) {
+        return res
+          .status(404)
+          .json({ error: new Error("This sauce does not exist !") });
+      }
+
+      switch (report) {
+        case 1:
+          reportSauce(sauce, userId, 1);
+          break;
+
+        default:
+          break;
+      }
+
+      Sauce.updateOne({ _id: req.params.id }, sauce)
+        .then(() => {
+          res.status(200).json(sauce, hateoasLinks(req, sauce._id));
+        })
+        .catch((err) => {
+          res.status(500).json({ error });
+        });
+    })
+    .catch((error) => res.status(500).json({ error }));
+};
+
+//////////////////////////////////////////////////////////////////////////////
+///////////////////////la fonction pour signaler un compte////////////////////
+
+
 //=================================>
 /////////////////// HATEOAS LINKS
 //=================================>

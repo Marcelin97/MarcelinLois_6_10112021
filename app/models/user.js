@@ -35,6 +35,7 @@ const userSchema = mongoose.Schema({
     },
   },
   usersAlert: [{ type: String, ref: "User" }],
+  reports: { type: Number, default: 0 },
 });
 //=================================>
 ///////////////// Template for auth.
