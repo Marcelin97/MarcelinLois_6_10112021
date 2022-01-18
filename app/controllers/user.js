@@ -264,73 +264,41 @@ exports.delete = (req, res) => {
 //////////////////////la fonction pour modifier son compte///////////////////
 //////////////////////////////////////////////////////////////////////////////
 //Three case, if only email, if only password and if twice
-// exports.update = async function (req, res) {
-//   const hash = await bcrypt.hash(req.body.password, 10);
-
-// User.findOneAndUpdate(
-//   req.params.id,
-//   {
-//     // _id: req.body.id,
-//     email: req.body.email,
-//     password: hash,
-//   },
-//   function (err, result) {
-//     if (err) {
-//       console.log("err", err);
-//       res.send("error updating user");
-//     } else {
-//       console.log(result);
-//       res.status(200).send({
-//         user: result,
-//         msg: "data updated successfully",
-//       });
-//     }
-//   }
-// );
-// };
-
 exports.update = async (req, res) => {
-  // Find user in the current session
-  // Encrypt email
-  var emailEncrypted = encrypted(req.body.email);
-  
-  let user = await User.findOne({ email: req.body.email });
-  // If user not found, return an error
-  if (!user) {
-    return res.status(404).json({ error: "User not found!" });
-  }
+  // console.log(req.auth);
+  const filter = { _id: req.auth.userID };
+  const update ={};
 
-  //If user change password
-  //     //sinon si je ne modifie pas mon email et que je modifie mon MDP alors...
-  if (!req.body.email && req.body.password) {
+  // If user change password
+  if (req.body.password) {
     // Encrypt the password send in request and save in the User object
     const hash = await bcrypt.hash(req.body.password, 10);
     // Save the password
-    user.password = hash;
-  }
+    update.password = hash;
+  };
 
   // If user change email
-  //si je modifie mon email et que je ne modifie pas mon MDP alors...
-  if (req.body.email && !req.body.password) {
+  if (req.body.email) {
     // Check email validation
     if (!validateEmail(req.body.email)) {
       return res.status(400).json({ error: "The specified email is invalid." });
-    }
+    };
 
     // Encrypt email
     var emailEncrypted = encrypted(req.body.email);
 
     // Save the email in the User object
-    user.email = emailEncrypted;
-  }
+    update.email = emailEncrypted;
+  };
 
   // Save the user and return a response
-  user
-    .updateOne()
-    .then(() => {
-      res
-        .status(201)
-        .json({ message: "User updated successfully" }, hateoasLinks(req));
+  User.findOneAndUpdate(filter, update, {
+    returnOriginal: true,
+    updatedExisting: true,
+  })
+    .then((user) => {
+      // console.log(user);
+      res.status(201).json(user, hateoasLinks(req));
     })
     .catch((error) => res.status(400).json({ error }));
 };
@@ -341,46 +309,38 @@ exports.update = async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////////la fonction pour signaler un compte////////////////////
 //////////////////////////////////////////////////////////////////////////////
-exports.report = (req, res, next) => {
-  // Params
-  const { userId, report } = req.body;
+// exports.report = async (req, res) => {
+//   let userId = req.body.userId;
+//   // Get current user in session
+//   let currentUser = await User.findOne({ _id: req.userId });
 
-  function reportSauce(sauce, userId, state) {
-    // The user want to report
-    if (state == 1) {
-      sauce["usersAlert"].push(sauce["usersAlert"].indexOf(userId), 1);
-      sauce.reports++;
-    }o
-  }
+//   // If current user not found, return an error
+//   if (!currentUser) {
+//     return res.status(401).json({ error: "Utilisateur introuvable." });
+//   }
 
-  Sauce.findById(req.params.id)
-    .then((sauce) => {
-      // on vérifie que la sauce existe bien
-      if (!Sauce) {
-        return res
-          .status(404)
-          .json({ error: new Error("This sauce does not exist !") });
-      }
+//   // User to alert
+//   User.findOne({ _id: userId })
+//     .then((user) => {
+//       // If user to alert not found, return an error
+//       if (!user) {
+//         return res.status(401).json({ error: "Utilisateur introuvable." });
+//       }
 
-      switch (report) {
-        case 1:
-          reportSauce(sauce, userId, 1);
-          break;
+//       if (user.usersAlert.indexOf(currentUser._id) === -1) {
+//         user.usersAlert.push(currentUser._id);
+//         user.save();
+//       }
 
-        default:
-          break;
-      }
-
-      Sauce.updateOne({ _id: req.params.id }, sauce)
-        .then(() => {
-          res.status(200).json(sauce, hateoasLinks(req, sauce._id));
-        })
-        .catch((err) => {
-          res.status(500).json({ error });
-        });
-    })
-    .catch((error) => res.status(500).json({ error }));
-};
+//       return res
+//         .status(200)
+//         .json(
+//           { message: "L'utilisateur a bien été signalé." },
+//           hateoasLinks(req)
+//         );
+//     })
+//     .catch((error) => res.status(500).json({ error }));
+// };
 
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////////la fonction pour signaler un compte////////////////////

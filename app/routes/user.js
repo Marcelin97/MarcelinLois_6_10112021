@@ -12,6 +12,8 @@ const { registerValidation } = require("../middleware/inputValidation");
 //on crée deux routes
 //ce sont des routes post car le front va également envoyé des informations
 
+//middleware d'authentification que nous appliquerons à nos routes pour les protégés
+const auth = require("../middleware/auth");
 //=================================>
 /////////////////// SIGNUP
 //=================================>
@@ -26,7 +28,7 @@ router.post("/login", verifyPassword, registerValidation, userCtrl.login);
 /////////////////// READ DATAS
 //=================================>
 router.get(
-  "/read-datas",
+  "/read-datas", auth,
   verifyPassword,
   registerValidation,
   userCtrl.readDatas
@@ -36,7 +38,7 @@ router.get(
 /////////////////// EXPORT DATAS
 //=================================>
 router.get(
-  "/export-datas",
+  "/export-datas", auth,
   verifyPassword,
   registerValidation,
   userCtrl.exportDatas
@@ -45,17 +47,17 @@ router.get(
 //=================================>
 /////////////////// DELETE
 //=================================>
-router.delete("/delete", verifyPassword, registerValidation, userCtrl.delete);
+router.delete("/delete", auth, verifyPassword, registerValidation, userCtrl.delete);
 
 //=================================>
 /////////////////// UPDATE
 //=================================>
-router.put("/update", verifyPassword, registerValidation, userCtrl.update);
+router.put("/update", auth, verifyPassword, registerValidation, userCtrl.update);
 
 //=================================>
 /////////////////// REPORT
 //=================================>
-router.post("/report", verifyPassword, registerValidation, userCtrl.report);
+// router.post("/report", auth, verifyPassword, registerValidation, userCtrl.report);
 
 //on exporte le router de ce fichier
 module.exports = router;
