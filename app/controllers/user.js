@@ -15,7 +15,6 @@ const Sauce = require("../models/sauce");
 
 // Import the filesystem module
 const fs = require("fs");
-const fsPromises = require("fs").promises;
 
 //=================================>
 /////////////////// ENCRYPTED EMAIL
