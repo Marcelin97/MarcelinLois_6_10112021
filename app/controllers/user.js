@@ -72,8 +72,8 @@ exports.signup = (req, res, next) => {
   if (!validateEmail(req.body.email)) {
     return res.status(400).json({ error: "L'email indiqué est invalide." });
   }
-  //la première choses on Hash le mot de pass (c'est une fonction asynchrone qui prends du temps) pour le crypter
-  //on appel la fonction bcrypt.hash pour crypter un MDP(on lui passe le MDP du corp de la requête, le salt c'est combien de fois on execute l'algo de hashage)
+  // la première choses on Hash le mot de pass (c'est une fonction asynchrone qui prends du temps) pour le crypter
+  // on appel la fonction bcrypt.hash pour crypter un MDP(on lui passe le MDP du corp de la requête, le salt c'est combien de fois on execute l'algo de hashage)
   bcrypt
     .hash(req.body.password, 10)
     //comme c'est une méthode asynchrone on a then et un catch
@@ -116,7 +116,6 @@ exports.login = (req, res, next) => {
   //on va commencer par trouvé le user dans la BDD qui correspond à l'email renseigner par la personne
   User.findOne({ email: emailEncrypted })
     .then((user) => {
-      //si on a pas trouvé de user
       if (!user) {
         return res.status(404).json({ error: "User not found!" });
       }
@@ -146,12 +145,9 @@ exports.login = (req, res, next) => {
             hateoasLinks(req)
           );
         })
-        // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user,
-        //on peut mettre une erreur serveur
+        // dans ce cas il va quand meme faire le tour de la bdd meme s'il trouve pas de user
         .catch((error) => res.status(500).json({ error }));
     })
-    //c'est uniquement si il a un problème de connexion ou lié à mongodb
-    //status 500 pour une erreur server
     .catch((error) => res.status(500).json({ error }));
 };
 //////////////////////////////////////////////////////////////////////////////
@@ -166,7 +162,6 @@ exports.readDatas = (req, res, next) => {
   var emailEncrypted = encrypted(req.body.email);
   User.findOne({ email: emailEncrypted })
     .then((user) => {
-      //si on a pas trouvé de user
       if (!user) {
         return res.status(404).json({ error: "User not found!" });
       }
@@ -312,14 +307,12 @@ exports.update = async (req, res) => {
 exports.report = async (req, res, next) => {
   // find user in the current session
   const currentUser = req.auth.userID;
-  // console.log(currentUser);
 
   User.findOneAndUpdate(req.userId, {
     new: true,
     returnOriginal: true,
     updatedExisting: true,
   }).then((user) => {
-    // console.log(user)
     if (!user) {
       return res.status(404).json({ error: new Error("User not found !") });
     }
@@ -352,6 +345,7 @@ exports.report = async (req, res, next) => {
 };
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////////la fonction pour signaler un compte////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 //=================================>
 /////////////////// HATEOAS LINKS
@@ -395,6 +389,12 @@ function hateoasLinks(req) {
       method: "DELETE",
       title: "Delete User",
       href: baseUri + "/api/auth/delete",
+    },
+    {
+      rel: "report",
+      method: "POST",
+      title: "Report a User",
+      href: baseUri + "/api/auth/report",
     },
   ];
 }

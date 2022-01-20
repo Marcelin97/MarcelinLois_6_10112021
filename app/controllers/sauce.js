@@ -20,7 +20,6 @@ exports.createSauce = (req, res, next) => {
 
   // Check if request contain text
   if (!req.body) {
-    //revoir le code erreur
     return res.status(422).json({
       message: "Your request does not contain text.",
     });
@@ -33,10 +32,9 @@ exports.createSauce = (req, res, next) => {
   const sauce = new Sauce({
     // l'opérateur spread ... permets de copier les champs qu'il y a dans la requête.
     ...sauceObject,
-    //je donne à mon image le nom qui est dans le corp de la requête.
+    // je donne à mon image le nom qui est dans le corp de la requête.
     imageUrl: `/images/${req.file.filename}`,
   });
-  // on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
     .save()
     .then(() => res.status(201).json(sauce, hateoasLinks(req, sauce._id)))
@@ -47,7 +45,7 @@ exports.createSauce = (req, res, next) => {
 /////////////////// Update sauce
 //=================================>
 exports.updateSauce = (req, res, next) => {
-  //je récupère l'image existante de ma sauce
+  // je récupère l'image existante de ma sauce
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     const filename = sauce.imageUrl.split("/images/")[1];
     // console.log(filename);
@@ -86,7 +84,7 @@ exports.deleteSauce = (req, res, next) => {
     .then((sauce) => {
       // je récupère le chemin ou est stocké mon image pour pouvoir la supprimer
       const imageUrl = path.join(__dirname, "../..", sauce.imageUrl);
-      //fs.unlink permets de supprimé l'image
+      // fs.unlink permets de supprimé l'image
       fs.unlink(imageUrl, () => {
         Sauce.deleteOne({ _id: req.params.id })
           .then(() => res.status(200).json({ message: "Sauce deleted !" }))
@@ -102,8 +100,7 @@ exports.deleteSauce = (req, res, next) => {
 exports.readOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      // console.log(sauce);
-      //le nom de la propriété est = au lien de l'url + le chemin relatif de l'image
+      // le nom de la propriété est = au lien de l'url + le chemin relatif de l'image
       sauce.imageUrl = `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
       res.status(200).json(sauce, hateoasLinks(req, sauce._id));
     })
@@ -121,12 +118,12 @@ exports.readAllSauces = (req, res, next) => {
           error: "No sauces to display",
         });
       } else {
-        //j'itère sur chaque sauce afin de lui ajouter l'URI de mon API et l'adresse de l'image
-        //sauce c'est mon x
+        // j'itère sur chaque sauce afin de lui ajouter l'URI de mon API et l'adresse de l'image
+        // sauce entre parenthèse c'est mon x
         sauces = sauces.map((sauce) => {
           sauce.imageUrl =
             `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
-          //retourne moi sauce avec son lien complet
+          // retourne moi la sauce avec son lien complet
           const links = hateoasLinks(req, sauce._id);
           const sauceHateoas = { ...sauce._doc, links };
           return sauceHateoas;
@@ -173,7 +170,6 @@ exports.likeSauce = (req, res, next) => {
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
-      // on vérifie que la sauce existe bien
       if (!Sauce) {
         return res
           .status(404)
@@ -204,13 +200,19 @@ exports.likeSauce = (req, res, next) => {
         .then(() => {
           res.status(200).json(sauce, hateoasLinks(req, sauce._id));
         })
-        .catch((err) => {
+        .catch((error) => {
           res.status(500).json({ error });
         });
     })
     .catch((error) => res.status(500).json({ error }));
 };
+//================================>
+/////////////////// LIKE // DISLIKE
+//=================================>
 
+//================================>
+/////////////////// REPORT
+//=================================>
 exports.report = (req, res, next) => {
   // Params
   const { userId, report } = req.body;
@@ -225,7 +227,6 @@ exports.report = (req, res, next) => {
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
-      // on vérifie que la sauce existe bien
       if (!Sauce) {
         return res
           .status(404)
@@ -251,8 +252,13 @@ exports.report = (req, res, next) => {
     })
     .catch((error) => res.status(500).json({ error }));
 };
+//================================>
+/////////////////// REPORT
+//=================================>
 
-// Return an array of all links HATEOAS
+//=================================>
+/////////////////// HATEOAS LINKS
+//=================================>
 function hateoasLinks(req, id) {
   const baseUri = `${req.protocol}://${req.get("host")}`;
 
@@ -294,5 +300,14 @@ function hateoasLinks(req, id) {
       title: "Like or Dislike Sauce",
       href: baseUri + "/api/sauces/" + id + "/like",
     },
+    {
+      rel: "report",
+      method: "POST",
+      title: "Report a Sauce",
+      href: baseUri + "/api/sauces/" + id + "/report",
+    },
   ];
 }
+//=================================>
+/////////////////// HATEOAS LINKS
+//=================================>
