@@ -309,38 +309,37 @@ exports.update = async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////////la fonction pour signaler un compte////////////////////
 //////////////////////////////////////////////////////////////////////////////
-// exports.report = async (req, res) => {
-//   let userId = req.body.userId;
-//   // Get current user in session
-//   let currentUser = await User.findOne({ _id: req.userId });
+exports.report = async (req, res, next) => {
+  // find user in the current session
+  const currentUser = req.auth.userID;
+  console.log(currentUser);
 
-//   // If current user not found, return an error
-//   if (!currentUser) {
-//     return res.status(401).json({ error: "Utilisateur introuvable." });
-//   }
 
-//   // User to alert
-//   User.findOne({ _id: userId })
-//     .then((user) => {
-//       // If user to alert not found, return an error
-//       if (!user) {
-//         return res.status(401).json({ error: "Utilisateur introuvable." });
-//       }
-
-//       if (user.usersAlert.indexOf(currentUser._id) === -1) {
-//         user.usersAlert.push(currentUser._id);
-//         user.save();
-//       }
-
-//       return res
-//         .status(200)
-//         .json(
-//           { message: "L'utilisateur a bien été signalé." },
-//           hateoasLinks(req)
-//         );
-//     })
-//     .catch((error) => res.status(500).json({ error }));
-// };
+  User.findOneAndUpdate(req.userId, {new: true,
+      returnOriginal: true,
+      updatedExisting: true,
+    })
+    .then((user) => {
+      console.log(user)
+      if (!user) {
+      return res
+        .status(404)
+        .json({ error: new Error("This sauce does not exist !") });
+      }
+      if (user.usersAlert.indexOf(currentUser) === 1) {
+        user.usersAlert.push(currentUser);
+        user.reports++;
+      }
+      
+      User.updateOne({ userID: req.userID }, user)
+        .then(() => {
+          res.status(200).json(user, hateoasLinks(req));
+        })
+        .catch((err) => {
+          res.status(500).json({ err });
+        });
+  })
+};
 
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////////la fonction pour signaler un compte////////////////////

@@ -57,7 +57,7 @@ router.put("/update", auth, verifyPassword, registerValidation, userCtrl.update)
 //=================================>
 /////////////////// REPORT
 //=================================>
-// router.post("/report", auth, verifyPassword, registerValidation, userCtrl.report);
+router.post("/report", auth, verifyPassword, registerValidation, userCtrl.report);
 
 //on exporte le router de ce fichier
 module.exports = router;

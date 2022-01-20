@@ -13,7 +13,6 @@ const path = require("path");
 exports.createSauce = (req, res, next) => {
   // Check if request contain files uploaded
   if (!req.file) {
-    //revoir le code erreur
     return res.status(422).json({
       message: "Your request does not contain an image.",
     });
@@ -247,7 +246,7 @@ exports.report = (req, res, next) => {
           res.status(200).json(sauce, hateoasLinks(req, sauce._id));
         })
         .catch((err) => {
-          res.status(500).json({ error });
+          res.status(500).json({ err });
         });
     })
     .catch((error) => res.status(500).json({ error }));
