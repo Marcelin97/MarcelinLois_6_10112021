@@ -7,15 +7,12 @@ const fs = require("fs");
 // The Path module provides a way of working with directories and file paths.
 const path = require("path");
 
-
 //=================================>
 /////////////////// Create sauce
 //=================================>
 exports.createSauce = (req, res, next) => {
-
   // Check if request contain files uploaded
   if (!req.file) {
-    //revoir le code erreur
     return res.status(422).json({
       message: "Your request does not contain an image.",
     });
@@ -23,7 +20,6 @@ exports.createSauce = (req, res, next) => {
 
   // Check if request contain text
   if (!req.body) {
-    //revoir le code erreur
     return res.status(422).json({
       message: "Your request does not contain text.",
     });
@@ -36,17 +32,12 @@ exports.createSauce = (req, res, next) => {
   const sauce = new Sauce({
     // l'opérateur spread ... permets de copier les champs qu'il y a dans la requête.
     ...sauceObject,
-    //je donne à mon image le nom qui est dans le corp de la requête.
+    // je donne à mon image le nom qui est dans le corp de la requête.
     imageUrl: `/images/${req.file.filename}`,
   });
-  // on utilise la méthode .save pour sauvegarder dans la BDD
   sauce
     .save()
-    .then(() =>
-      res
-        .status(201)
-        .json(sauce, hateoasLinks(req, sauce._id))
-    )
+    .then(() => res.status(201).json(sauce, hateoasLinks(req, sauce._id)))
     .catch((error) => res.status(500).json({ error }));
 };
 
@@ -54,10 +45,10 @@ exports.createSauce = (req, res, next) => {
 /////////////////// Update sauce
 //=================================>
 exports.updateSauce = (req, res, next) => {
-  //je récupère l'image existante de ma sauce
+  // je récupère l'image existante de ma sauce
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     const filename = sauce.imageUrl.split("/images/")[1];
-    console.log(filename);
+    // console.log(filename);
     const sauceObject = req.file
       ? {
           ...JSON.parse(req.body.sauce),
@@ -70,19 +61,15 @@ exports.updateSauce = (req, res, next) => {
       if (sauceObject.imageUrl) {
         fs.unlinkSync(`images/${filename}`);
       }
-    } catch(error){
-       console.log(error)
+    } catch (error) {
+      console.log(error);
     }
 
     Sauce.updateOne(
       { _id: req.params.id },
       { ...sauceObject, _id: req.params.id }
     )
-      .then(() =>
-        res
-          .status(200)
-          .json(sauce, hateoasLinks(req, sauce._id))
-      )
+      .then(() => res.status(200).json(sauce, hateoasLinks(req, sauce._id)))
       .catch((error) =>
         res.status(500).json({ error: "Request not allowed !" })
       );
@@ -97,16 +84,10 @@ exports.deleteSauce = (req, res, next) => {
     .then((sauce) => {
       // je récupère le chemin ou est stocké mon image pour pouvoir la supprimer
       const imageUrl = path.join(__dirname, "../..", sauce.imageUrl);
-      //fs.unlink permets de supprimé l'image
+      // fs.unlink permets de supprimé l'image
       fs.unlink(imageUrl, () => {
         Sauce.deleteOne({ _id: req.params.id })
-          .then(() =>
-            res
-              .status(200)
-              .json(
-                { message: "Sauce deleted !" }
-              )
-          )
+          .then(() => res.status(200).json({ message: "Sauce deleted !" }))
           .catch((error) => res.status(500).json({ error }));
       });
     })
@@ -119,8 +100,7 @@ exports.deleteSauce = (req, res, next) => {
 exports.readOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      // console.log(sauce);
-      //le nom de la propriété est = au lien de l'url + le chemin relatif de l'image
+      // le nom de la propriété est = au lien de l'url + le chemin relatif de l'image
       sauce.imageUrl = `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
       res.status(200).json(sauce, hateoasLinks(req, sauce._id));
     })
@@ -138,18 +118,18 @@ exports.readAllSauces = (req, res, next) => {
           error: "No sauces to display",
         });
       } else {
-        //j'itère sur chaque sauce afin de lui ajouter l'URI de mon API et l'adresse de l'image
-        //sauce c'est mon x
+        // j'itère sur chaque sauce afin de lui ajouter l'URI de mon API et l'adresse de l'image
+        // sauce entre parenthèse c'est mon x
         sauces = sauces.map((sauce) => {
           sauce.imageUrl =
             `${req.protocol}://${req.get("host")}` + sauce.imageUrl;
-          //retourne moi sauce avec son lien complet
+          // retourne moi la sauce avec son lien complet
           const links = hateoasLinks(req, sauce._id);
-          const sauceHateoas = { ...sauce._doc, links};
+          const sauceHateoas = { ...sauce._doc, links };
           return sauceHateoas;
         });
         res.status(200).json(sauces);
-      } 
+      }
     })
     .catch((error) => res.status(500).json({ error }));
 };
@@ -190,7 +170,6 @@ exports.likeSauce = (req, res, next) => {
 
   Sauce.findById(req.params.id)
     .then((sauce) => {
-      // on vérifie que la sauce existe bien
       if (!Sauce) {
         return res
           .status(404)
@@ -219,21 +198,67 @@ exports.likeSauce = (req, res, next) => {
 
       Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => {
-          res
-            .status(200)
-            .json(
-              sauce,
-              hateoasLinks(req, sauce._id)
-            );
+          res.status(200).json(sauce, hateoasLinks(req, sauce._id));
         })
-        .catch((err) => {
+        .catch((error) => {
           res.status(500).json({ error });
         });
     })
     .catch((error) => res.status(500).json({ error }));
 };
+//================================>
+/////////////////// LIKE // DISLIKE
+//=================================>
 
-// Return an array of all links HATEOAS
+//================================>
+/////////////////// REPORT
+//=================================>
+exports.report = (req, res, next) => {
+  // Params
+  const { userId, report } = req.body;
+
+  function reportSauce(sauce, userId, state) {
+    // The user want to report
+    if (state == 1) {
+      sauce["usersAlert"].push(sauce["usersAlert"].indexOf(userId), 1);
+      sauce.reports++;
+    }
+  }
+
+  Sauce.findById(req.params.id)
+    .then((sauce) => {
+      if (!Sauce) {
+        return res
+          .status(404)
+          .json({ error: new Error("This sauce does not exist !") });
+      }
+
+      switch (report) {
+        case 1:
+          reportSauce(sauce, userId, 1);
+          break;
+
+        default:
+          break;
+      }
+
+      Sauce.updateOne({ _id: req.params.id }, sauce)
+        .then(() => {
+          res.status(200).json(sauce, hateoasLinks(req, sauce._id));
+        })
+        .catch((err) => {
+          res.status(500).json({ err });
+        });
+    })
+    .catch((error) => res.status(500).json({ error }));
+};
+//================================>
+/////////////////// REPORT
+//=================================>
+
+//=================================>
+/////////////////// HATEOAS LINKS
+//=================================>
 function hateoasLinks(req, id) {
   const baseUri = `${req.protocol}://${req.get("host")}`;
 
@@ -275,5 +300,14 @@ function hateoasLinks(req, id) {
       title: "Like or Dislike Sauce",
       href: baseUri + "/api/sauces/" + id + "/like",
     },
+    {
+      rel: "report",
+      method: "POST",
+      title: "Report a Sauce",
+      href: baseUri + "/api/sauces/" + id + "/report",
+    },
   ];
 }
+//=================================>
+/////////////////// HATEOAS LINKS
+//=================================>

@@ -15,6 +15,8 @@ const sauceSchema = mongoose.Schema({
   dislikes: { type: Number, default: 0 },
   usersLiked: [{ type: String, ref: "User" }],
   usersDisliked: [{ type: String, ref: "User" }],
+  usersAlert: [{ type: String, ref: "User" }],
+  reports: { type: Number, default: 0 },
 });
 //=================================>
 ///////////////// Template for sauce
