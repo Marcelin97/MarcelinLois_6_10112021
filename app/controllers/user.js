@@ -267,7 +267,7 @@ exports.delete = (req, res) => {
 exports.update = async (req, res) => {
   // console.log(req.auth);
   const filter = { _id: req.auth.userID };
-  const update ={};
+  const update = {};
 
   // If user change password
   if (req.body.password) {
@@ -275,21 +275,21 @@ exports.update = async (req, res) => {
     const hash = await bcrypt.hash(req.body.password, 10);
     // Save the password
     update.password = hash;
-  };
+  }
 
   // If user change email
   if (req.body.email) {
     // Check email validation
     if (!validateEmail(req.body.email)) {
       return res.status(400).json({ error: "The specified email is invalid." });
-    };
+    }
 
     // Encrypt email
     var emailEncrypted = encrypted(req.body.email);
 
     // Save the email in the User object
     update.email = emailEncrypted;
-  };
+  }
 
   // Save the user and return a response
   User.findOneAndUpdate(filter, update, {
@@ -312,38 +312,46 @@ exports.update = async (req, res) => {
 exports.report = async (req, res, next) => {
   // find user in the current session
   const currentUser = req.auth.userID;
-  console.log(currentUser);
+  // console.log(currentUser);
 
+  User.findOneAndUpdate(req.userId, {
+    new: true,
+    returnOriginal: true,
+    updatedExisting: true,
+  }).then((user) => {
+    // console.log(user)
+    if (!user) {
+      return res.status(404).json({ error: new Error("User not found !") });
+    }
+    // if current user report this user, push this user in the array and add a report
+    if (user.usersAlert.indexOf(currentUser)) {
+      user.usersAlert.push(currentUser);
+      user.reports++;
+    }
+    // if current user already report this user return an error
+    if (!user.usersAlert.indexOf(currentUser)) {
+      return res.send("You can't report yourself");
+    }
 
-  User.findOneAndUpdate(req.userId, {new: true,
-      returnOriginal: true,
-      updatedExisting: true,
-    })
-    .then((user) => {
-      console.log(user)
-      if (!user) {
-      return res
-        .status(404)
-        .json({ error: new Error("This sauce does not exist !") });
-      }
-      if (user.usersAlert.indexOf(currentUser) === 1) {
-        user.usersAlert.push(currentUser);
-        user.reports++;
-      }
-      
-      User.updateOne({ userID: req.userID }, user)
-        .then(() => {
-          res.status(200).json(user, hateoasLinks(req));
-        })
-        .catch((err) => {
-          res.status(500).json({ err });
-        });
-  })
+    User.updateOne({ userID: req.userID }, user)
+      .then(() => {
+        res
+          .status(200)
+          .json(
+            {
+              message:
+                "A report has been created, we will deal with it as soon as possible.",
+            },
+            hateoasLinks(req)
+          );
+      })
+      .catch((err) => {
+        res.status(500).json({ err });
+      });
+  });
 };
-
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////////la fonction pour signaler un compte////////////////////
-
 
 //=================================>
 /////////////////// HATEOAS LINKS
