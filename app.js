@@ -30,9 +30,9 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "So Pekocko",
+    title: "Piiquante",
     version: "1.0.0",
-    description: "So Pekocko API documentation",
+    description: "Piiquante API documentation",
     contact: {
       name: "Web developer",
       email: "lois_m@outlook.com",
@@ -46,6 +46,10 @@ const swaggerDefinition = {
     basePath: /api/,
   },
 };
+
+SwaggerUI({
+  enableQueryConfig: false, // new
+});
 
 const options = {
   swaggerDefinition,

@@ -137,7 +137,7 @@ router.get("/:id", auth, sauceCtrl.readOneSauce);
 
 /**
  * @swagger
- * /sauces:
+ * sauces:
  *   get:
  *     tags:
  *       - Read all Sauces.
@@ -173,7 +173,7 @@ router.get("/", auth, sauceCtrl.readAllSauces);
 
 /**
  * @swagger
- * /sauces/{id}:
+ * sauces/{id}:
  *   put:
  *     tags:
  *       - UPDATE an existing sauce.
@@ -209,7 +209,7 @@ router.put("/:id", auth, multer, sauceCtrl.updateSauce);
 
 /**
  * @swagger
- * /sauces/{id}:
+ * sauces/{id}:
  *   delete:
  *     tags:
  *       - DELETE an existing sauce.
