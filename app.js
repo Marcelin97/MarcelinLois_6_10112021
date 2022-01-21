@@ -21,9 +21,60 @@ const router = require("./app/routes/index");
 
 const hateoasLinker = require("express-hateoas-links");
 
+//=================================>
+///// Adding Swagger documentation
+//=================================>
+const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
+const swaggerDefinition = {
+  openapi: "3.0.0",
+  info: {
+    title: "So Pekocko",
+    version: "1.0.0",
+    description: "So Pekocko API documentation",
+    contact: {
+      name: "Web developer",
+      email: "lois_m@outlook.com",
+    },
+    servers: [
+      {
+        url: "http://localhost:3000",
+        description: "Development server",
+      },
+    ],
+    basePath: /api/,
+  },
+};
+
+const options = {
+  swaggerDefinition,
+  // Paths to files containing OpenAPI definitions
+  apis: ["./app/routes/*.js"],
+  // We hid the top bar with:
+  customCss: ".swagger-ui .topbar { display: none }",
+  // We can load the Swagger file from a URL with the url option:
+  url: "http://localhost:3000/docs/swagger.json",
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+//=================================>
+///// Adding Swagger documentation
+//=================================>
+
 // On crée une constante app qui est notre application. 
 // On appel la méthode express ce qui permet de crée une application express
 const app = express();
+
+//=================================>
+///// Adding Swagger documentation
+//=================================>
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+//=================================>
+///// Adding Swagger documentation
+//=================================>
 
 //=================================>
 /////////////////// Middleware CORS
@@ -55,6 +106,7 @@ app.use(bodyParser.json())
 //=================================>
 ///////////// End Limit payload size
 //=================================>
+
 
 // replace standard express res.json with the new version
 app.use(hateoasLinker);
