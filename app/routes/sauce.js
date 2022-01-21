@@ -13,6 +13,9 @@ const multer = require('../middleware/multer-config')
 //=================================>
 /////////////////// Create sauce
 //=================================>
+
+
+
 router.post("/", auth, multer, sauceCtrl.createSauce);
 
 //=================================>
@@ -23,6 +26,37 @@ router.get("/:id", auth, sauceCtrl.readOneSauce);
 //=================================>
 /////////////////// Get all sauces
 //=================================>
+
+/**
+ * @swagger
+ * /sauces:
+ *   get:
+ *     tags:
+ *       - Read all Sauces.
+ *     description: Return an array of all Sauces object.
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Return an array of all sauces objects in database.
+ *         requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *                     type: object
+ *                     properties:
+ *                       imageUrl:
+ *                         type: string
+ *                         description: A image url.
+ *                         example: /images/pexels-cottonbro-3338500.jpg1641993851628.jpg
+ *                       items:
+ *                         type: string
+ *                         description: The sauce's schema.
+ *                         required:
+ *                          - imageUrl
+ *                          - items    
+ */
 router.get("/", auth, sauceCtrl.readAllSauces);
 
 //=================================>
