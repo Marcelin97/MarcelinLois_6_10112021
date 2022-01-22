@@ -16,7 +16,7 @@
   "author": "Marcelin97",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.1",
     "bunyan": "^1.8.15",
     "bunyan-express-serializer": "^1.0.0",
