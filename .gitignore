@@ -7,3 +7,4 @@ logs/*
 /logs/*
 !logs/.gitkeep
 !/logs/.gitkeep
+.idea
