@@ -24,7 +24,24 @@ git clone https://github.com/Marcelin97/MarcelinLois_6_10112021.git
 ```
 #### Create .env file (copy .env.example) and set you environment
 ```bash
-cd JWDP5
+# MongoDB URL (to change)
+MONGO_URI=******
+
+# Secret key used to sign JWT tokens
+TOKEN_SECRET=******
+
+# cryto-js keys
+PASSPHRASE=pass-phrase
+IV=pass-phrase-iv
+
+## 👇🏾 Don't change anything below 👇🏾
+
+# App host / port configuration
+PORT=3000
+
+# Client app URL
+CLIENT_ENDPOINT='http://127.0.0.1:8081'
+
 ```
 #### How to run the server
 
@@ -38,7 +55,7 @@ The server should run on localhost with default port 3000.
 
 #### How to install front-end
 
-Follow instructions on this repo (https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6) to install and use the frontend
+Follow instructions on this repo (https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6) to install and use the front-end
 
 #### Clone this repository
 ```bash
