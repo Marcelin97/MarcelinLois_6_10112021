@@ -35,8 +35,7 @@ if (!process.env.MONGO_URI) {
 
 function serializer(data) {
   let query = JSON.stringify(data.query);
-  let options = JSON.stringify(data.options || {});
-
+  let options = JSON.stringify(data.options || {})
   return `db.${data.coll}.${data.method}(${query}, ${options});`;
 }
 
@@ -48,7 +47,6 @@ mongoose.set("debug", function (coll, method, query, doc, options) {
     doc: doc,
     options: options,
   };
-
   log.info({
     dbQuery: set,
   });

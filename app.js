@@ -47,10 +47,6 @@ const swaggerDefinition = {
   },
 };
 
-SwaggerUI({
-  enableQueryConfig: false, // new
-});
-
 const options = {
   swaggerDefinition,
   // Paths to files containing OpenAPI definitions
