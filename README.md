@@ -38,7 +38,7 @@ The server should run on localhost with default port 3000.
 
 #### How to install front-end
 
-Follow instructions on this repo to install and use the frontend
+Follow instructions on this repo (https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6) to install and use the frontend
 
 #### Clone this repository
 ```bash
